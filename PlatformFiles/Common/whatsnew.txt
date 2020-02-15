@@ -1,7 +1,8 @@
-Version 5.8 Update 1
+Version 5.8 Update 8
 
-- [CHG] Changed target .NET Framework version to 4.6.1 on Windows
-- [CHG] Reduced the size of the User Guide PDF file
-- [FIX] Fixed Automation feature
-- [FIX] Fixed some issues with ReoGrid formula parsing
-- [FIX] Enhanced reliability of liquid phase instability detection
+- [NEW] Added a Pervaporation sample
+- [NEW] Added support for external Unit Operations
+- [NEW] Added the ability to load and use images as flowsheet object icons for Python Script UOs
+- [FIX] Fixed some automation bugs
+- [FIX] Fixed Pipe insulation calculation
+- [FIX] Bug fixes

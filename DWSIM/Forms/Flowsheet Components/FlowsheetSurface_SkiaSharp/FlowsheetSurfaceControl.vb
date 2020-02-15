@@ -37,10 +37,12 @@ Public Class FlowsheetSurfaceControl
 
     Private Sub FlowsheetSurfaceControl_MouseUp(sender As Object, e As MouseEventArgs) Handles Me.MouseUp
         FlowsheetSurface.InputRelease()
+#If Not WINE32 Then
         If My.Settings.DisplayPFDTip Then
             MessageBox.Show(DWSIM.App.GetLocalString("PFDTip"), "DWSIM", MessageBoxButtons.OK, MessageBoxIcon.Information)
             My.Settings.DisplayPFDTip = False
         End If
+#End If
         Invalidate()
         Invalidate()
     End Sub
@@ -160,7 +162,15 @@ Public Class FlowsheetSurfaceControl
 
             Dim pt = PointToClient(New Point(e.X, e.Y))
 
-            FlowsheetObject.FormSurface.AddObject(t.Name, pt.X / FlowsheetSurface.Zoom, pt.Y / FlowsheetSurface.Zoom, c)
+            If t.GetInterface("DWSIM.Interfaces.IExternalUnitOperation", True) Is Nothing Then
+
+                FlowsheetObject.FormSurface.AddObject(t.Name, pt.X / FlowsheetSurface.Zoom, pt.Y / FlowsheetSurface.Zoom, c)
+
+            Else
+
+                FlowsheetObject.FormSurface.AddObjectToSurface(ObjectType.External, pt.X / FlowsheetSurface.Zoom, pt.Y / FlowsheetSurface.Zoom, False, "", "", Activator.CreateInstance(t))
+
+            End If
 
         End If
     End Sub

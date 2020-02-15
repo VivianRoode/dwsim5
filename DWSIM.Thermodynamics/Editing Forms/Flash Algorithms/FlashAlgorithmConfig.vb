@@ -1,6 +1,5 @@
 ﻿Imports DWSIM.SharedClasses
 Imports Microsoft.Win32
-Imports DWSIM.Interfaces.Interfaces2
 Imports CapeOpen
 
 Public Class FlashAlgorithmConfig
@@ -32,13 +31,19 @@ Public Class FlashAlgorithmConfig
             Me.Text += " - " & FlashAlgo.Tag
 
             Select Case FlashAlgo.AlgoType
-                Case Interfaces.Enums.FlashMethod.Default_Algorithm, Interfaces.Enums.FlashMethod.Nested_Loops_VLE, Interfaces.Enums.FlashMethod.Nested_Loops_SVLLE
+                Case Interfaces.Enums.FlashMethod.Default_Algorithm, Interfaces.Enums.FlashMethod.Nested_Loops_VLE
                     TabControl1.TabPages.Remove(TabPageGM)
                     TabControl1.TabPages.Remove(TabPageIO)
                     TabControl1.TabPages.Remove(TabPageCOES)
                     TabControl1.TabPages.Remove(TabPageIM)
                     TabControl1.TabPages.Remove(TabPageUD)
                     TabControl1.TabPages.Remove(TabPageST)
+                Case Interfaces.Enums.FlashMethod.Nested_Loops_SVLLE
+                    TabControl1.TabPages.Remove(TabPageGM)
+                    TabControl1.TabPages.Remove(TabPageIO)
+                    TabControl1.TabPages.Remove(TabPageCOES)
+                    TabControl1.TabPages.Remove(TabPageIM)
+                    TabControl1.TabPages.Remove(TabPageUD)
                 Case Interfaces.Enums.FlashMethod.Nested_Loops_VLLE
                     TabControl1.TabPages.Remove(TabPageGM)
                     TabControl1.TabPages.Remove(TabPageIO)
@@ -109,6 +114,7 @@ Public Class FlashAlgorithmConfig
 
             TabControl1.TabPages.Remove(TabPageCOES)
             TabControl1.TabPages.Remove(TabPageGeneral)
+            TabControl1.TabPages.Remove(TabPageUD)
 
         End If
 
@@ -145,8 +151,6 @@ Public Class FlashAlgorithmConfig
 
             End If
 
-            _loaded = True
-
         Else
 
             tbPHExtMaxIt.Text = Integer.Parse(Settings(Interfaces.Enums.FlashSetting.PHFlash_Maximum_Number_Of_External_Iterations), ci).ToString
@@ -173,46 +177,53 @@ Public Class FlashAlgorithmConfig
             cbMinMethodGM.SelectedItem = Settings(Interfaces.Enums.FlashSetting.GM_OptimizationMethod)
 
             NumericUpDown1.Value = Settings(Interfaces.Enums.FlashSetting.ST_Number_of_Random_Tries)
+            chkForcePT3P.Checked = Settings(Interfaces.Enums.FlashSetting.CheckIncipientLiquidForStability)
 
-            If Not ExcelMode Then SetupKeyCompounds()
+            If Not ExcelMode Then
 
-            If FlashAlgo.AlgoType = Interfaces.Enums.FlashMethod.UserDefined Then
+                SetupKeyCompounds()
 
-                Dim udfa = DirectCast(FlashAlgo, PropertyPackages.Auxiliary.FlashAlgorithms.UserDefined)
+                If FlashAlgo.AlgoType = Interfaces.Enums.FlashMethod.UserDefined Then
 
-                If udfa.PTFlash IsNot Nothing Then
-                    PBPTFlash.Image = My.Resources.accept
-                    lblPTFlash.Text = "Defined"
-                    btnTestPTFlash.Enabled = True
-                End If
+                    Dim udfa = DirectCast(FlashAlgo, PropertyPackages.Auxiliary.FlashAlgorithms.UserDefined)
 
-                If udfa.PHFlash IsNot Nothing Then
-                    PBPHFlash.Image = My.Resources.accept
-                    lblPHFlash.Text = "Defined"
-                    btnTestPHFlash.Enabled = True
-                End If
+                    If udfa.PTFlash IsNot Nothing Then
+                        PBPTFlash.Image = My.Resources.accept
+                        lblPTFlash.Text = "Defined"
+                        btnTestPTFlash.Enabled = True
+                    End If
 
-                If udfa.PSFlash IsNot Nothing Then
-                    PBPSFlash.Image = My.Resources.accept
-                    lblPSFlash.Text = "Defined"
-                    btnTestPSFlash.Enabled = True
-                End If
+                    If udfa.PHFlash IsNot Nothing Then
+                        PBPHFlash.Image = My.Resources.accept
+                        lblPHFlash.Text = "Defined"
+                        btnTestPHFlash.Enabled = True
+                    End If
 
-                If udfa.PVFlash IsNot Nothing Then
-                    PBPVFFlash.Image = My.Resources.accept
-                    lblPVFFlash.Text = "Defined"
-                    btnTestPVFFlash.Enabled = True
-                End If
+                    If udfa.PSFlash IsNot Nothing Then
+                        PBPSFlash.Image = My.Resources.accept
+                        lblPSFlash.Text = "Defined"
+                        btnTestPSFlash.Enabled = True
+                    End If
 
-                If udfa.TVFlash IsNot Nothing Then
-                    PBTVFFlash.Image = My.Resources.accept
-                    lblTVFFlash.Text = "Defined"
-                    btnTestTVFFlash.Enabled = True
+                    If udfa.PVFlash IsNot Nothing Then
+                        PBPVFFlash.Image = My.Resources.accept
+                        lblPVFFlash.Text = "Defined"
+                        btnTestPVFFlash.Enabled = True
+                    End If
+
+                    If udfa.TVFlash IsNot Nothing Then
+                        PBTVFFlash.Image = My.Resources.accept
+                        lblTVFFlash.Text = "Defined"
+                        btnTestTVFFlash.Enabled = True
+                    End If
+
                 End If
 
             End If
 
         End If
+
+        _loaded = True
 
     End Sub
 
@@ -252,17 +263,17 @@ Public Class FlashAlgorithmConfig
             End If
 
             If tbPHExtMaxIt.Text <> "" Then Settings(Interfaces.Enums.FlashSetting.PHFlash_Maximum_Number_Of_External_Iterations) = Integer.Parse(tbPHExtMaxIt.Text).ToString(ci)
-            If tbPHExtMaxTol.Text <> "" Then Settings(Interfaces.Enums.FlashSetting.PHFlash_External_Loop_Tolerance) = Double.Parse(tbPHExtMaxTol.Text).ToString(ci)
+            If tbPHExtMaxTol.Text <> "" Then Settings(Interfaces.Enums.FlashSetting.PHFlash_External_Loop_Tolerance) = tbPHExtMaxTol.Text.ToDoubleFromCurrent().ToString(ci)
             If tbPHIntMaxIt.Text <> "" Then Settings(Interfaces.Enums.FlashSetting.PHFlash_Maximum_Number_Of_Internal_Iterations) = Integer.Parse(tbPHIntMaxIt.Text).ToString(ci)
-            If tbPHintMaxTol.Text <> "" Then Settings(Interfaces.Enums.FlashSetting.PHFlash_Internal_Loop_Tolerance) = Double.Parse(tbPHintMaxTol.Text).ToString(ci)
+            If tbPHintMaxTol.Text <> "" Then Settings(Interfaces.Enums.FlashSetting.PHFlash_Internal_Loop_Tolerance) = tbPHintMaxTol.Text.ToDoubleFromCurrent().ToString(ci)
             If tbPTExtMaxIt.Text <> "" Then Settings(Interfaces.Enums.FlashSetting.PTFlash_Maximum_Number_Of_External_Iterations) = Integer.Parse(tbPTExtMaxIt.Text).ToString(ci)
-            If tbPTExtTol.Text <> "" Then Settings(Interfaces.Enums.FlashSetting.PTFlash_External_Loop_Tolerance) = Double.Parse(tbPTExtTol.Text).ToString(ci)
+            If tbPTExtTol.Text <> "" Then Settings(Interfaces.Enums.FlashSetting.PTFlash_External_Loop_Tolerance) = tbPTExtTol.Text.ToDoubleFromCurrent().ToString(ci)
             If tbPTintMaxIt.Text <> "" Then Settings(Interfaces.Enums.FlashSetting.PTFlash_Maximum_Number_Of_Internal_Iterations) = Integer.Parse(tbPTintMaxIt.Text).ToString(ci)
-            If tbPTIntTol.Text <> "" Then Settings(Interfaces.Enums.FlashSetting.PTFlash_Internal_Loop_Tolerance) = Double.Parse(tbPTIntTol.Text).ToString(ci)
+            If tbPTIntTol.Text <> "" Then Settings(Interfaces.Enums.FlashSetting.PTFlash_Internal_Loop_Tolerance) = tbPTIntTol.Text.ToDoubleFromCurrent().ToString(ci)
 
-            If tbPV_MaxDT.Text <> "" Then Settings(Interfaces.Enums.FlashSetting.PVFlash_MaximumTemperatureChange) = Double.Parse(tbPV_MaxDT.Text).ToString(ci)
-            If tbPV_DampingFactor.Text <> "" Then Settings(Interfaces.Enums.FlashSetting.PVFlash_FixedDampingFactor) = Double.Parse(tbPV_DampingFactor.Text).ToString(ci)
-            If tbPV_EpsilonT.Text <> "" Then Settings(Interfaces.Enums.FlashSetting.PVFlash_TemperatureDerivativeEpsilon) = Double.Parse(tbPV_EpsilonT.Text).ToString(ci)
+            If tbPV_MaxDT.Text <> "" Then Settings(Interfaces.Enums.FlashSetting.PVFlash_MaximumTemperatureChange) = tbPV_MaxDT.Text.ToDoubleFromCurrent().ToString(ci)
+            If tbPV_DampingFactor.Text <> "" Then Settings(Interfaces.Enums.FlashSetting.PVFlash_FixedDampingFactor) = tbPV_DampingFactor.Text.ToDoubleFromCurrent().ToString(ci)
+            If tbPV_EpsilonT.Text <> "" Then Settings(Interfaces.Enums.FlashSetting.PVFlash_TemperatureDerivativeEpsilon) = tbPV_EpsilonT.Text.ToDoubleFromCurrent().ToString(ci)
 
             Settings(Interfaces.Enums.FlashSetting.NL_FastMode) = chkFastModeNL.Checked
 
@@ -673,6 +684,14 @@ Public Class FlashAlgorithmConfig
     Private Sub NumericUpDown1_ValueChanged(sender As Object, e As EventArgs) Handles NumericUpDown1.ValueChanged
 
         If _loaded Then Settings(Interfaces.Enums.FlashSetting.ST_Number_of_Random_Tries) = NumericUpDown1.Value
+
+    End Sub
+
+    Private Sub CheckBox1_CheckedChanged(sender As Object, e As EventArgs) Handles chkForcePT3P.CheckedChanged
+        Settings(Interfaces.Enums.FlashSetting.CheckIncipientLiquidForStability) = chkForcePT3P.Checked
+    End Sub
+
+    Private Sub Label28_Click(sender As Object, e As EventArgs) Handles Label28.Click
 
     End Sub
 

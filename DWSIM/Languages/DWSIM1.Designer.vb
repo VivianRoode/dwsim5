@@ -497,6 +497,24 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to Coeficiente Adiabático.
+        '''</summary>
+        Friend Shared ReadOnly Property AdiabaticCoefficient() As String
+            Get
+                Return ResourceManager.GetString("AdiabaticCoefficient", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Head Adiabático.
+        '''</summary>
+        Friend Shared ReadOnly Property AdiabaticHead() As String
+            Get
+                Return ResourceManager.GetString("AdiabaticHead", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to Adicionar figura.
         '''</summary>
         Friend Shared ReadOnly Property Adicionarfigura() As String
@@ -3202,6 +3220,15 @@ Namespace My.Resources
         Friend Shared ReadOnly Property CpPhaseVapor() As String
             Get
                 Return ResourceManager.GetString("CpPhaseVapor", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Uma nova janela do Criador de compostos será exibida e este assistente será fechado. Após inserir todos os dados necessários, exporte o composto para um arquivo JSON, abra o painel Configurações de Simulação para esta Flowsheet e carregue o arquivo JSON salvo. Clique em &apos;Sim&apos; para continuar..
+        '''</summary>
+        Friend Shared ReadOnly Property CreateFromUNIFACWarning() As String
+            Get
+                Return ResourceManager.GetString("CreateFromUNIFACWarning", resourceCulture)
             End Get
         End Property
         
@@ -8137,6 +8164,15 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to O Inspetor está desativado..
+        '''</summary>
+        Friend Shared ReadOnly Property inspectordisabled() As String
+            Get
+                Return ResourceManager.GetString("inspectordisabled", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to Intermitente.
         '''</summary>
         Friend Shared ReadOnly Property Intermitente() As String
@@ -10063,6 +10099,15 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to Nenhum relatório encontrado..
+        '''</summary>
+        Friend Shared ReadOnly Property noreportsavailable() As String
+            Get
+                Return ResourceManager.GetString("noreportsavailable", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to Note que, sempre que o Pacote de Propriedades da simulação é modificado, todos os objetos têm suas propriedades (calculadas) zeradas..
         '''</summary>
         Friend Shared ReadOnly Property NotequesemprequeoPac() As String
@@ -11112,6 +11157,33 @@ Namespace My.Resources
         Friend Shared ReadOnly Property Plstico() As String
             Get
                 Return ResourceManager.GetString("Plstico", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Coeficiente Politrópico.
+        '''</summary>
+        Friend Shared ReadOnly Property PolytropicCoefficient() As String
+            Get
+                Return ResourceManager.GetString("PolytropicCoefficient", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Eficiência Politrópica.
+        '''</summary>
+        Friend Shared ReadOnly Property PolytropicEfficiency() As String
+            Get
+                Return ResourceManager.GetString("PolytropicEfficiency", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Head Politrópico.
+        '''</summary>
+        Friend Shared ReadOnly Property PolytropicHead() As String
+            Get
+                Return ResourceManager.GetString("PolytropicHead", resourceCulture)
             End Get
         End Property
         
@@ -12745,6 +12817,15 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to {0} relatório(s) disponível(is)..
+        '''</summary>
+        Friend Shared ReadOnly Property reportsavailable() As String
+            Get
+                Return ResourceManager.GetString("reportsavailable", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to Coordenada da reação selecionada.
         '''</summary>
         Friend Shared ReadOnly Property REqPGridItem1Help() As String
@@ -13002,6 +13083,15 @@ Namespace My.Resources
         Friend Shared ReadOnly Property Rotaodoobjetode0a360() As String
             Get
                 Return ResourceManager.GetString("Rotaodoobjetode0a360", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Velocidade de Rotação.
+        '''</summary>
+        Friend Shared ReadOnly Property RotationSpeed() As String
+            Get
+                Return ResourceManager.GetString("RotationSpeed", resourceCulture)
             End Get
         End Property
         

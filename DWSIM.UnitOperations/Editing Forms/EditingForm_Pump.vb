@@ -29,6 +29,25 @@ Public Class EditingForm_Pump
 
         Loaded = False
 
+        If Host.Items.Where(Function(x) x.Name.Contains(SimObject.GraphicObject.Tag)).Count > 0 Then
+            If InspReportBar Is Nothing Then
+                InspReportBar = New SharedClasses.InspectorReportBar
+                InspReportBar.Dock = DockStyle.Bottom
+                AddHandler InspReportBar.Button1.Click, Sub()
+                                                            Dim iwindow As New Inspector.Window2
+                                                            iwindow.SelectedObject = SimObject
+                                                            iwindow.Show(DockPanel)
+                                                        End Sub
+                Me.Controls.Add(InspReportBar)
+                InspReportBar.BringToFront()
+            End If
+        Else
+            If InspReportBar IsNot Nothing Then
+                Me.Controls.Remove(InspReportBar)
+                InspReportBar = Nothing
+            End If
+        End If
+
         With SimObject
 
             'first block
@@ -88,7 +107,7 @@ Public Class EditingForm_Pump
             Dim proppacks As String() = .FlowSheet.PropertyPackages.Values.Select(Function(m) m.Tag).ToArray
             cbPropPack.Items.Clear()
             cbPropPack.Items.AddRange(proppacks)
-            cbPropPack.SelectedItem = .PropertyPackage.Tag
+            cbPropPack.SelectedItem = .PropertyPackage?.Tag
 
             Dim flashalgos As String() = .FlowSheet.FlowsheetOptions.FlashAlgorithms.Select(Function(x) x.Tag).ToArray
             cbFlashAlg.Items.Clear()

@@ -57,6 +57,25 @@ Public Class MaterialStreamEditor
 
         Loaded = False
 
+        If Host.Items.Where(Function(x) x.Name.Contains(MatStream.GraphicObject.Tag)).Count > 0 Then
+            If InspReportBar Is Nothing Then
+                InspReportBar = New SharedClasses.InspectorReportBar
+                InspReportBar.Dock = DockStyle.Bottom
+                AddHandler InspReportBar.Button1.Click, Sub()
+                                                            Dim iwindow As New Inspector.Window2
+                                                            iwindow.SelectedObject = MatStream
+                                                            iwindow.Show(DockPanel)
+                                                        End Sub
+                Me.Controls.Add(InspReportBar)
+                InspReportBar.BringToFront()
+            End If
+        Else
+            If InspReportBar IsNot Nothing Then
+                Me.Controls.Remove(InspReportBar)
+                InspReportBar = Nothing
+            End If
+        End If
+
         With MatStream
 
             'first block
@@ -178,16 +197,22 @@ Public Class MaterialStreamEditor
 
             'property package
 
-            Dim proppacks As String() = .FlowSheet.PropertyPackages.Values.Select(Function(m) m.Tag).ToArray
-            cbPropPack.Items.Clear()
-            cbPropPack.Items.AddRange(proppacks)
-            cbPropPack.SelectedItem = .PropertyPackage.Tag
+            Try
+                Dim proppacks As String() = .FlowSheet.PropertyPackages.Values.Select(Function(m) m.Tag).ToArray
+                cbPropPack.Items.Clear()
+                cbPropPack.Items.AddRange(proppacks)
+                cbPropPack.SelectedItem = .PropertyPackage.Tag
+            Catch ex As Exception
+            End Try
 
-            Dim flashalgos As String() = .FlowSheet.FlowsheetOptions.FlashAlgorithms.Select(Function(x) x.Tag).ToArray
-            cbFlashAlg.Items.Clear()
-            cbFlashAlg.Items.Add("Default")
-            cbFlashAlg.Items.AddRange(flashalgos)
-            If .PreferredFlashAlgorithmTag <> "" Then cbFlashAlg.SelectedItem = .PreferredFlashAlgorithmTag Else cbFlashAlg.SelectedIndex = 0
+            Try
+                Dim flashalgos As String() = .FlowSheet.FlowsheetOptions.FlashAlgorithms.Select(Function(x) x.Tag).ToArray
+                cbFlashAlg.Items.Clear()
+                cbFlashAlg.Items.Add("Default")
+                cbFlashAlg.Items.AddRange(flashalgos)
+                If .PreferredFlashAlgorithmTag <> "" Then cbFlashAlg.SelectedItem = .PreferredFlashAlgorithmTag Else cbFlashAlg.SelectedIndex = 0
+            Catch ex As Exception
+            End Try
 
             'compound amounts floating table
 

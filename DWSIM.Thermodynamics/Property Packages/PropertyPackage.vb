@@ -224,6 +224,12 @@ Namespace PropertyPackages
 
         Public Property IgnoreSalinityLimit As Boolean = False
 
+        ''' <summary>
+        ''' ' For mobile compatibility only.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ParametersXMLString = ""
+
 
 #End Region
 
@@ -2599,10 +2605,10 @@ Namespace PropertyPackages
                                     xv = (H - hl) / (hv - hl)
                                 End If
                                 IObj?.SetCurrent()
-                                If Tsat > Me.AUX_TCM(Phase.Mixture) Then
-                                    xv = 1.0#
-                                    LoopVarState = State.Vapor
-                                End If
+                                'If Tsat > Me.AUX_TCM(Phase.Mixture) Then
+                                '    xv = 1.0#
+                                '    LoopVarState = State.Vapor
+                                'End If
                                 xl = 1 - xv - xs
 
                                 If xv <> 0.0# And xv <> 1.0# And xs = 0.0# Then
@@ -5943,10 +5949,10 @@ Final3:
 
             Dim fT, fT_inf, nsub, delta_T As Double
 
-            Tinf = 10
-            Tsup = 2000
+            Tinf = 0.1
+            Tsup = 10000
 
-            nsub = 25
+            nsub = 50
 
             delta_T = (Tsup - Tinf) / nsub
 
@@ -6139,6 +6145,14 @@ Final3:
                 With Me.CurrentMaterialStream.Phases(0).Compounds(sub1).ConstantProperties
                     Dim dens = AUX_LIQDENSi(Me.CurrentMaterialStream.Phases(0).Compounds(sub1).ConstantProperties, T)
                     Dim visc = Auxiliary.PROPS.oilvisc_twu(T, .PF_Tv1, .PF_Tv2, .PF_v1, .PF_v2)
+                    If Double.IsNaN(visc) Then
+                        Dim Tc, Pc, w, Mw As Double
+                        Tc = Me.CurrentMaterialStream.Phases(0).Compounds(sub1).ConstantProperties.Critical_Temperature
+                        Pc = Me.CurrentMaterialStream.Phases(0).Compounds(sub1).ConstantProperties.Critical_Pressure
+                        w = Me.CurrentMaterialStream.Phases(0).Compounds(sub1).ConstantProperties.Acentric_Factor
+                        Mw = Me.CurrentMaterialStream.Phases(0).Compounds(sub1).ConstantProperties.Molar_Weight
+                        visc = Auxiliary.PROPS.viscl_letsti(T, Tc, Pc, w, Mw)
+                    End If
                     Return visc * dens
                 End With
             Else
@@ -6254,7 +6268,7 @@ Final3:
                     IObj?.Paragraphs.Add(String.Format("Compressed Liquid Viscosity Correction Factor: {0}", pcorr))
                     lval = lval * pcorr
                     IObj?.Paragraphs.Add(String.Format("Corrected Liquid Viscosity : {0} Pa.s", Exp(lval)))
-                    If Double.IsNaN(lval) Or Double.IsInfinity(lval) Then
+                    If Double.IsNaN(lval) Or Double.IsInfinity(lval) And subst.MoleFraction.GetValueOrDefault > 0 Then
                         Throw New Exception(String.Format("Error calculating viscosity for '{0}'. Temperature: {1} K, Pressure: {2} Pa. Calculated value: {3}", subst.Name, T, P, lval))
                     End If
                 End If
@@ -7746,6 +7760,76 @@ Final3:
                 val(i) = subst.ConstantProperties.CAS_Number
                 i += 1
             Next
+
+            Return val
+
+        End Function
+
+        Public Function RET_VNAMES2(order As Interfaces.Enums.CompoundOrdering) As String()
+
+            Dim val(Me.CurrentMaterialStream.Phases(0).Compounds.Count - 1) As String
+            Dim subst As Interfaces.ICompound
+            Dim i As Integer = 0
+
+            Select Case order
+                Case CompoundOrdering.CAS_ASC
+                    For Each subst In Me.CurrentMaterialStream.Phases(0).Compounds.Values.OrderBy(Function(c) c.ConstantProperties.CAS_Number)
+                        val(i) = subst.ConstantProperties.Name
+                        i += 1
+                    Next
+                Case CompoundOrdering.CAS_DESC
+                    For Each subst In Me.CurrentMaterialStream.Phases(0).Compounds.Values.OrderByDescending(Function(c) c.ConstantProperties.CAS_Number)
+                        val(i) = subst.ConstantProperties.Name
+                        i += 1
+                    Next
+                Case CompoundOrdering.MW_ASC
+                    For Each subst In Me.CurrentMaterialStream.Phases(0).Compounds.Values.OrderBy(Function(c) c.ConstantProperties.Molar_Weight)
+                        val(i) = subst.ConstantProperties.Name
+                        i += 1
+                    Next
+                Case CompoundOrdering.MW_DESC
+                    For Each subst In Me.CurrentMaterialStream.Phases(0).Compounds.Values.OrderByDescending(Function(c) c.ConstantProperties.Molar_Weight)
+                        val(i) = subst.ConstantProperties.Name
+                        i += 1
+                    Next
+                Case CompoundOrdering.Name_ASC
+                    For Each subst In Me.CurrentMaterialStream.Phases(0).Compounds.Values.OrderBy(Function(c) c.ConstantProperties.Name)
+                        val(i) = subst.ConstantProperties.Name
+                        i += 1
+                    Next
+                Case CompoundOrdering.Name_DESC
+                    For Each subst In Me.CurrentMaterialStream.Phases(0).Compounds.Values.OrderByDescending(Function(c) c.ConstantProperties.Name)
+                        val(i) = subst.ConstantProperties.Name
+                        i += 1
+                    Next
+                Case CompoundOrdering.NBP_ASC
+                    For Each subst In Me.CurrentMaterialStream.Phases(0).Compounds.Values.OrderBy(Function(c) c.ConstantProperties.Normal_Boiling_Point)
+                        val(i) = subst.ConstantProperties.Name
+                        i += 1
+                    Next
+                Case CompoundOrdering.NBP_DESC
+                    For Each subst In Me.CurrentMaterialStream.Phases(0).Compounds.Values.OrderByDescending(Function(c) c.ConstantProperties.Normal_Boiling_Point)
+                        val(i) = subst.ConstantProperties.Name
+                        i += 1
+                    Next
+                Case CompoundOrdering.TAG_ASC
+                    For Each subst In Me.CurrentMaterialStream.Phases(0).Compounds.Values.OrderBy(Function(c) c.ConstantProperties.Tag)
+                        val(i) = subst.ConstantProperties.Name
+                        i += 1
+                    Next
+                Case CompoundOrdering.TAG_DESC
+                    For Each subst In Me.CurrentMaterialStream.Phases(0).Compounds.Values.OrderByDescending(Function(c) c.ConstantProperties.Tag)
+                        val(i) = subst.ConstantProperties.Name
+                        i += 1
+                    Next
+                Case Else
+                    For Each subst In Me.CurrentMaterialStream.Phases(0).Compounds.Values
+                        val(i) = subst.ConstantProperties.Name
+                        i += 1
+                    Next
+            End Select
+
+
 
             Return val
 
@@ -10951,6 +11035,11 @@ Final3:
             End Try
 
             Try
+                Me.ParametersXMLString = (From el As XElement In data Select el Where el.Name = "Parameters").FirstOrDefault.ToString()
+            Catch ex As Exception
+            End Try
+
+            Try
                 OverrideKvalFugCoeff = (From el As XElement In data Select el Where el.Name = "OverrideKvalFugCoeff").FirstOrDefault.Value
             Catch ex As Exception
             End Try
@@ -11361,6 +11450,14 @@ Final3:
                 .Add(New XElement("Tag", Tag))
                 .Add(New XElement("TPSeverity", _tpseverity))
                 .Add(New XElement("TPCompIDs", XMLSerializer.XMLSerializer.ArrayToString2(_tpcompids, ci)))
+
+                If ParametersXMLString <> "" Then
+                    Try
+                        .Add(XElement.Parse(Me.ParametersXMLString))
+                    Catch ex As Exception
+                    End Try
+                End If
+
                 .Add(New XElement("OverrideKvalFugCoeff", OverrideKvalFugCoeff))
                 .Add(New XElement("OverrideEnthalpyCalculation", OverrideEnthalpyCalculation))
                 .Add(New XElement("OverrideEntropyCalculation", OverrideEntropyCalculation))

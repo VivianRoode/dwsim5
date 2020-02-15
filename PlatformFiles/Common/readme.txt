@@ -1,7 +1,7 @@
 ﻿==================================================
 DWSIM - Open Source Process Simulator
-Version 5.8 Update 1
-Copyright (c) 2017-2019 Daniel Medeiros
+Version 5.8 Update 8
+Copyright (c) 2017-2020 Daniel Medeiros
 Copyright (c) 2008-2016 Daniel Medeiros, Gregor Reichert, Gustavo Leon
 ==================================================
 
@@ -61,6 +61,59 @@ VERSION HISTORY / CHANGELOG
 ==================================================
 
 The full changelog, including code changes and their authors can be viewed at https://github.com/DanWBR/dwsim5/commits/windows
+
+Version 5.8 Update 8
+
+- [NEW] Added a Pervaporation sample
+- [NEW] Added support for external Unit Operations
+- [NEW] Added the ability to load and use images as flowsheet object icons for Python Script UOs
+- [FIX] Fixed some automation bugs
+- [FIX] Fixed Pipe insulation calculation
+- [FIX] Bug fixes
+
+Version 5.8 Update 7
+
+- [NEW] Added Performance Curves and Polytropic Process support to Compressor and Expander
+- [FIX] Fixed single compound phase detection
+- [FIX] Other bug fixes
+
+Version 5.8 Update 6
+
+- [NEW] Define the number of grouping rows in Master Property Table
+- [FIX] Fixed loading and saving of simulation files in mobile version format (Android/iOS)
+- [FIX] Fixed Absorber Column in Liquid-Liquid Extraction mode
+- [FIX] Fixed the Filter property editor in Cross-Platform UI
+- [FIX] Fixed Filter cake resistance unit conversion
+- [FIX] Fixed the Script Editor not working on Classic UI
+- [FIX] Other bug fixes
+
+Version 5.8 Update 5
+
+- [NEW] Integrated Solution Inspector with object editors
+- [CHG] Enhanced compound selection panel in simulation setup wizard (Classic UI)
+- [FIX] Fixed a bug with Master Tables
+- [FIX] Fixed Excel Add-In Settings panel not loading correctly
+- [FIX] Other bug fixes
+
+Version 5.8 Update 4
+
+- [NEW] Added a Tag property to compounds for custom ordering
+- [NEW] Added Compound ordering capability to Cross-Platform UI (CPUI)
+- [NEW] Enhanced object connections editor (CPUI)
+- [FIX] Fixed Spreadsheet Copy/Paste (CPUI)
+- [FIX] Fixed Compressor/Expander calculation mode selection (CPUI)
+
+Version 5.8 Update 3
+
+- [FIX] Fixed Valve Kv calculation mode for Gas/Steam
+- [FIX] Fixed loading of properties for some Unit Operations
+- [FIX] Other minor bug fixes
+
+Version 5.8 Update 2
+
+- [NEW] Added a new VLLE Flash Algorithm tweak to check for alternative liquid phase compositions on initial VLE PT Flash
+- [FIX] Fixed Rigorous Column automatic initialization
+- [FIX] Fixed number of trial compositions not changing on Flash Algorithm editor
 
 Version 5.8 Update 1
 

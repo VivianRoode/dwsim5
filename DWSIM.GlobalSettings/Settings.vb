@@ -162,7 +162,12 @@ Public Class Settings
 
     Shared Sub LoadExcelSettings(Optional ByVal configfile As String = "")
 
+        Dim configfiledir = GetConfigFileDir()
+
+        If Not Directory.Exists(configfiledir) Then Directory.CreateDirectory(configfiledir)
+
         If configfile = "" Then configfile = My.Application.Info.DirectoryPath + Path.DirectorySeparatorChar + "dwsim.ini"
+
         If Not File.Exists(configfile) Then File.Copy(My.Application.Info.DirectoryPath + Path.DirectorySeparatorChar + "default.ini", configfile)
 
         Dim doc As New Nini.Ini.IniDocument(configfile, Nini.Ini.IniFileType.WindowsStyle)
@@ -414,9 +419,9 @@ Public Class Settings
 
         EditorTextBoxFixedSize = source.Configs("Misc").GetBoolean("EditorTextBoxFixedSize", True)
 
-        EditOnSelect = source.Configs("Misc").GetBoolean("EditOnSelect", False)
+        EditOnSelect = source.Configs("Misc").GetBoolean("EditOnSelect", True)
 
-        CallSolverOnEditorPropertyChanged = source.Configs("Misc").GetBoolean("CallSolverOnEditorPropertyChanged", False)
+        CallSolverOnEditorPropertyChanged = source.Configs("Misc").GetBoolean("CallSolverOnEditorPropertyChanged", True)
 
         UIScalingFactor = source.Configs("Misc").GetDouble("UIScalingFactor", 1.0)
 

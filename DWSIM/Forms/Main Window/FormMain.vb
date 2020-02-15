@@ -38,7 +38,8 @@ Imports DWSIM.Drawing.SkiaSharp.GraphicObjects.Tables
 Imports DWSIM.Drawing.SkiaSharp.GraphicObjects.Shapes
 Imports DWSIM.Drawing.SkiaSharp.GraphicObjects.Charts
 
-Imports Cefsharp.Winforms
+Imports CefSharp.WinForms
+Imports DWSIM.Interfaces
 
 Public Class FormMain
 
@@ -65,6 +66,7 @@ Public Class FormMain
     Public AvailableUnitSystems As New Dictionary(Of String, SystemsOfUnits.Units)
     Public PropertyPackages As New Dictionary(Of String, PropertyPackages.PropertyPackage)
     Public FlashAlgorithms As New Dictionary(Of String, Thermodynamics.PropertyPackages.Auxiliary.FlashAlgorithms.FlashAlgorithm)
+    Public Property ExternalUnitOperations As New Dictionary(Of String, Interfaces.IExternalUnitOperation)
 
     Public COMonitoringObjects As New Dictionary(Of String, UnitOperations.UnitOperations.Auxiliary.CapeOpen.CapeOpenUnitOpInfo)
     Public WithEvents timer1 As New Timer
@@ -241,12 +243,14 @@ Public Class FormMain
                 My.Application.UtilityPlugins.Add(ip.UniqueID, ip)
             Next
 
+#If Not WINE32 Then
             'load external property packages from 'propertypackages' folder, if there is any
             Dim epplist As List(Of PropertyPackage) = GetExternalPPs(LoadExternalPPs())
 
             For Each pp As PropertyPackage In epplist
                 PropertyPackages.Add(pp.ComponentName, pp)
             Next
+#End If
 
             'Search and populate CAPE-OPEN Flowsheet Monitoring Object collection
             'SearchCOMOs() 'doing this only when the user hovers the mouse over the plugins toolstrip menu item
@@ -257,6 +261,8 @@ Public Class FormMain
             Me.FrmOptions.Dock = DockStyle.Fill
             Me.SettingsPanel.Controls.Add(Me.FrmOptions)
             Me.ButtonClose.BringToFront()
+
+            tsbInspector.Checked = GlobalSettings.Settings.InspectorEnabled
 
             Me.FrmWelcome = New FormWelcome
             Me.FrmWelcome.Owner = Me
@@ -274,7 +280,7 @@ Public Class FormMain
                     '    Dim c1, c2, c3, c4, c5 As WebBrowser
                     '    Dim a1, a2, a3, a4, a5 As String
 
-                    '    a1 = "https://www.patreon.com/dwsim/posts"
+                    '    a1 = "https://www.patreon.com/dwsim"
                     '    a2 = "https://sourceforge.net/p/dwsim/discussion/"
                     '    a3 = "https://dwsim.fossee.in/forum"
                     '    a4 = "https://www.youtube.com/channel/UCzzBQrycKoN5XbCeLV12y3Q/videos?view=0&sort=dd&flow=grid"
@@ -306,7 +312,7 @@ Public Class FormMain
                         Dim c1, c2, c3, c4, c5 As ChromiumWebBrowser
                         Dim a1, a2, a3, a4, a5 As String
 
-                        a1 = "https://www.patreon.com/dwsim/posts"
+                        a1 = "https://www.patreon.com/dwsim"
                         a2 = "https://sourceforge.net/p/dwsim/discussion/"
                         a3 = "https://dwsim.fossee.in/forum"
                         a4 = "https://www.youtube.com/channel/UCzzBQrycKoN5XbCeLV12y3Q/videos?view=0&sort=dd&flow=grid"
@@ -611,6 +617,16 @@ Public Class FormMain
 
     End Sub
 
+    Sub AddExternalUOs()
+
+        Dim otheruos = SharedClasses.Utility.LoadAdditionalUnitOperations()
+
+        For Each uo In otheruos
+            ExternalUnitOperations.Add(uo.Description, uo)
+        Next
+
+    End Sub
+
     Sub AddPropPacks()
 
         Dim CPPP As CoolPropPropertyPackage = New CoolPropPropertyPackage()
@@ -729,17 +745,17 @@ Public Class FormMain
 
         PropertyPackages.Add(LKPPP.ComponentName.ToString, LKPPP)
 
-        Dim EUQPP As ExUNIQUACPropertyPackage = New ExUNIQUACPropertyPackage()
-        EUQPP.ComponentName = "Extended UNIQUAC (Aqueous Electrolytes)"
-        EUQPP.ComponentDescription = DWSIM.App.GetLocalString("DescEUPP")
+        'Dim EUQPP As ExUNIQUACPropertyPackage = New ExUNIQUACPropertyPackage()
+        'EUQPP.ComponentName = "Extended UNIQUAC (Aqueous Electrolytes)"
+        'EUQPP.ComponentDescription = DWSIM.App.GetLocalString("DescEUPP")
 
-        PropertyPackages.Add(EUQPP.ComponentName.ToString, EUQPP)
+        'PropertyPackages.Add(EUQPP.ComponentName.ToString, EUQPP)
 
-        Dim ENQPP As New ElectrolyteNRTLPropertyPackage()
-        ENQPP.ComponentName = "Electrolyte NRTL (Aqueous Electrolytes)"
-        ENQPP.ComponentDescription = DWSIM.App.GetLocalString("DescENPP")
+        'Dim ENQPP As New ElectrolyteNRTLPropertyPackage()
+        'ENQPP.ComponentName = "Electrolyte NRTL (Aqueous Electrolytes)"
+        'ENQPP.ComponentDescription = DWSIM.App.GetLocalString("DescENPP")
 
-        PropertyPackages.Add(ENQPP.ComponentName.ToString, ENQPP)
+        'PropertyPackages.Add(ENQPP.ComponentName.ToString, ENQPP)
 
         Dim BOPP As BlackOilPropertyPackage = New BlackOilPropertyPackage()
         BOPP.ComponentName = "Black Oil"
@@ -934,6 +950,10 @@ Public Class FormMain
             End If
         Next
 
+    End Sub
+
+    Sub UpdateFOSSEEList()
+
         For Each item In FOSSEEList
             Dim tsmi As New ToolStripMenuItem
             With tsmi
@@ -987,6 +1007,7 @@ Public Class FormMain
                                        End If
                                    End Sub
         Next
+
 
     End Sub
 
@@ -1166,6 +1187,7 @@ Public Class FormMain
     End Function
 
     Private Function RandomString(ByVal size As Integer, ByVal lowerCase As Boolean) As String
+
         Dim builder As New StringBuilder()
         Dim random As New Random()
         Dim ch As Char
@@ -1178,7 +1200,8 @@ Public Class FormMain
             Return builder.ToString().ToLower()
         End If
         Return builder.ToString()
-    End Function 'RandomString 
+
+    End Function
 
     Sub AddGraphicObjects(form As FormFlowsheet, data As List(Of XElement), excs As Concurrent.ConcurrentBag(Of Exception),
                           Optional ByVal pkey As String = "", Optional ByVal shift As Integer = 0, Optional ByVal reconnectinlets As Boolean = False)
@@ -1224,6 +1247,15 @@ Public Class FormMain
                     ElseIf TypeOf obj Is RigorousColumnGraphic Or TypeOf obj Is AbsorptionColumnGraphic Or TypeOf obj Is CAPEOPENGraphic Then
                         obj.CreateConnectors(xel.Element("InputConnectors").Elements.Count, xel.Element("OutputConnectors").Elements.Count)
                         obj.PositionConnectors()
+                    ElseIf TypeOf obj Is ExternalUnitOperationGraphic Then
+                        Dim euo = ExternalUnitOperations.Values.Where(Function(x) x.Description = obj.Description).FirstOrDefault
+                        If euo IsNot Nothing Then
+                            obj.Owner = euo
+                            DirectCast(euo, Interfaces.ISimulationObject).GraphicObject = obj
+                            obj.CreateConnectors(0, 0)
+                            obj.Owner = Nothing
+                            DirectCast(euo, Interfaces.ISimulationObject).GraphicObject = Nothing
+                        End If
                     Else
                         If obj.Name = "" Then obj.Name = obj.Tag
                         obj.CreateConnectors(0, 0)
@@ -1240,11 +1272,9 @@ Public Class FormMain
             Try
                 Dim id As String = pkey & xel.Element("Name").Value
                 If id <> "" Then
-                    Dim obj As GraphicObject = (From go As GraphicObject In
-                                                            form.FormSurface.FlowsheetSurface.DrawingObjects Where go.Name = id).SingleOrDefault
-                    If obj Is Nothing Then obj = (From go As GraphicObject In
-                                                                                    form.FormSurface.FlowsheetSurface.DrawingObjects Where go.Name = xel.Element("Name").Value).SingleOrDefault
-                    If Not obj Is Nothing Then
+                    Dim obj As GraphicObject = (From go As GraphicObject In form.FormSurface.FlowsheetSurface.DrawingObjects Where go.Name = id).SingleOrDefault
+                    If obj Is Nothing Then obj = (From go As GraphicObject In form.FormSurface.FlowsheetSurface.DrawingObjects Where go.Name = xel.Element("Name").Value).SingleOrDefault
+                    If obj IsNot Nothing Then
                         If xel.Element("InputConnectors") IsNot Nothing Then
                             Dim i As Integer = 0
                             For Each xel2 As XElement In xel.Element("InputConnectors").Elements
@@ -1275,9 +1305,8 @@ Public Class FormMain
             Try
                 Dim id As String = pkey & xel.Element("Name").Value
                 If id <> "" Then
-                    Dim obj As GraphicObject = (From go As GraphicObject In
-                                                            form.FormSurface.FlowsheetSurface.DrawingObjects Where go.Name = id).SingleOrDefault
-                    If Not obj Is Nothing Then
+                    Dim obj As GraphicObject = (From go As GraphicObject In form.FormSurface.FlowsheetSurface.DrawingObjects Where go.Name = id).SingleOrDefault
+                    If obj IsNot Nothing Then
                         If xel.Element("OutputConnectors") IsNot Nothing Then
                             For Each xel2 As XElement In xel.Element("OutputConnectors").Elements
                                 If xel2.@IsAttached = True Then
@@ -1319,6 +1348,7 @@ Public Class FormMain
             End Try
         Next
 
+
     End Sub
 
     Sub AddSimulationObjects(form As FormFlowsheet, objlist As Concurrent.ConcurrentBag(Of SharedClasses.UnitOperations.BaseClass), excs As Concurrent.ConcurrentBag(Of Exception), Optional ByVal pkey As String = "")
@@ -1327,7 +1357,6 @@ Public Class FormMain
             Try
                 obj.Name = pkey & obj.Name
                 Dim id = obj.Name
-                Dim gobj = obj.GraphicObject
                 form.Collections.FlowsheetObjectCollection.Add(id, obj)
             Catch ex As Exception
                 excs.Add(New Exception("Error Loading Unit Operation Information", ex))
@@ -1393,11 +1422,13 @@ Public Class FormMain
             xdoc = XDocument.Load(fstr)
         End Using
 
-        For Each xel1 As XElement In xdoc.Descendants
-            SharedClasses.Utility.UpdateElementForMobileXMLLoading(xel1)
-        Next
+        Parallel.ForEach(xdoc.Descendants, Sub(xel1)
+                                               SharedClasses.Utility.UpdateElementForMobileXMLLoading_CrossPlatformUI(xel1)
+                                           End Sub)
 
         Dim form As FormFlowsheet = New FormFlowsheet() With {.MobileCompatibilityMode = True}
+        form.FormSpreadsheet = New FormNewSpreadsheet() With {.Flowsheet = form}
+        form.FormSpreadsheet.Initialize()
         form.PanelMobileCompatMode.Visible = True
 
         Settings.CAPEOPENMode = False
@@ -1822,10 +1853,15 @@ Public Class FormMain
             Try
                 Dim id As String = xel.<Name>.Value
                 Dim obj As SharedClasses.UnitOperations.BaseClass = Nothing
-                If xel.Element("Type").Value.Contains("MaterialStream") Then
+                If xel.Element("Type").Value.Contains("Streams.MaterialStream") Then
                     obj = pp.ReturnInstance(xel.Element("Type").Value)
                 Else
-                    obj = UnitOperations.Resolver.ReturnInstance(xel.Element("Type").Value)
+                    Dim uokey As String = xel.Element("ComponentDescription").Value
+                    If ExternalUnitOperations.ContainsKey(uokey) Then
+                        obj = ExternalUnitOperations(uokey).ReturnInstance(xel.Element("Type").Value)
+                    Else
+                        obj = UnitOperations.Resolver.ReturnInstance(xel.Element("Type").Value)
+                    End If
                 End If
                 Dim gobj As GraphicObject = (From go As GraphicObject In
                                     form.FormSurface.FlowsheetSurface.DrawingObjects Where go.Name = id).SingleOrDefault
@@ -2120,6 +2156,10 @@ Public Class FormMain
 
             form.FormSurface.Invalidate()
 
+        Else
+
+            form.CalculationQueue = New Queue(Of ICalculationArgs)
+
         End If
 
         If excs.Count > 0 Then
@@ -2334,10 +2374,15 @@ Public Class FormMain
             Try
                 Dim id As String = xel.<Name>.Value
                 Dim obj As SharedClasses.UnitOperations.BaseClass = Nothing
-                If xel.Element("Type").Value.Contains("MaterialStream") Then
+                If xel.Element("Type").Value.Contains("Streams.MaterialStream") Then
                     obj = pp.ReturnInstance(xel.Element("Type").Value)
                 Else
-                    obj = UnitOperations.Resolver.ReturnInstance(xel.Element("Type").Value)
+                    Dim uokey As String = xel.Element("ComponentDescription").Value
+                    If ExternalUnitOperations.ContainsKey(uokey) Then
+                        obj = ExternalUnitOperations(uokey).ReturnInstance(xel.Element("Type").Value)
+                    Else
+                        obj = UnitOperations.Resolver.ReturnInstance(xel.Element("Type").Value)
+                    End If
                 End If
                 Dim gobj As GraphicObject = (From go As GraphicObject In
                                     form.FormSurface.FlowsheetSurface.DrawingObjects Where go.Name = id).SingleOrDefault
@@ -2504,6 +2549,7 @@ Public Class FormMain
 
         Try
             If DWSIM.App.IsRunningOnMono Then form.FormSpreadsheet = New FormNewSpreadsheet() With {.Flowsheet = form}
+            form.FormSpreadsheet.Initialize()
             If (Not (xdoc.Element("DWSIM_Simulation_Data").Element("Spreadsheet")) Is Nothing) Then
                 Dim rgfdataelement = xdoc.Element("DWSIM_Simulation_Data").Element("Spreadsheet").Element("RGFData")
                 If (Not (rgfdataelement) Is Nothing) Then
@@ -2571,6 +2617,7 @@ Public Class FormMain
             form.FormLog.DockPanel = Nothing
             form.FormMatList.DockPanel = Nothing
             form.FormSpreadsheet.DockPanel = Nothing
+            form.FormSpreadsheet.Flowsheet = form
             form.FormCharts.DockPanel = Nothing
             form.FormWatch.DockPanel = Nothing
             form.FormSurface.DockPanel = Nothing
@@ -2674,6 +2721,23 @@ Public Class FormMain
         xel.Add(New XElement("OSInfo", My.Computer.Info.OSFullName & ", Version " & My.Computer.Info.OSVersion & ", " & My.Computer.Info.OSPlatform & " Platform"))
         xel.Add(New XElement("SavedOn", Date.Now))
 
+
+        xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("GraphicObjects"))
+        xel = xdoc.Element("DWSIM_Simulation_Data").Element("GraphicObjects")
+
+        For Each go As GraphicObject In form.FormSurface.FlowsheetSurface.DrawingObjects
+            If TypeOf go Is ShapeGraphic Then DirectCast(go, ShapeGraphic).Fill = False
+            Dim xdata As New XElement("GraphicObject", go.SaveData().ToArray())
+            If TypeOf go Is ShapeGraphic Then DirectCast(go, ShapeGraphic).Fill = True
+            If xdata.Elements.Count > 0 Then
+                If go.ObjectType = ObjectType.Compressor Then xdata.Element("ObjectType").Value = xdata.Element("ObjectType").Value.Replace("Compressor", "CompressorExpander")
+                If go.ObjectType = ObjectType.Expander Then xdata.Element("ObjectType").Value = xdata.Element("ObjectType").Value.Replace("Expander", "CompressorExpander")
+                If go.ObjectType = ObjectType.Heater Then xdata.Element("ObjectType").Value = xdata.Element("ObjectType").Value.Replace("Heater", "HeaterCooler")
+                If go.ObjectType = ObjectType.Cooler Then xdata.Element("ObjectType").Value = xdata.Element("ObjectType").Value.Replace("Cooler", "HeaterCooler")
+            End If
+            If Not go.IsConnector Then xel.Add(xdata)
+        Next
+
         xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("SimulationObjects"))
         xel = xdoc.Element("DWSIM_Simulation_Data").Element("SimulationObjects")
 
@@ -2711,22 +2775,6 @@ Public Class FormMain
         xel = xdoc.Element("DWSIM_Simulation_Data").Element("Settings")
 
         xel.Add(form.Options.SaveData().ToArray())
-
-        xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("GraphicObjects"))
-        xel = xdoc.Element("DWSIM_Simulation_Data").Element("GraphicObjects")
-
-        For Each go As GraphicObject In form.FormSurface.FlowsheetSurface.DrawingObjects
-            If TypeOf go Is ShapeGraphic Then DirectCast(go, ShapeGraphic).Fill = False
-            Dim xdata As New XElement("GraphicObject", go.SaveData().ToArray())
-            If TypeOf go Is ShapeGraphic Then DirectCast(go, ShapeGraphic).Fill = True
-            If xdata.Elements.Count > 0 Then
-                If go.ObjectType = ObjectType.Compressor Then xdata.Element("ObjectType").Value = xdata.Element("ObjectType").Value.Replace("Compressor", "CompressorExpander")
-                If go.ObjectType = ObjectType.Expander Then xdata.Element("ObjectType").Value = xdata.Element("ObjectType").Value.Replace("Expander", "CompressorExpander")
-                If go.ObjectType = ObjectType.Heater Then xdata.Element("ObjectType").Value = xdata.Element("ObjectType").Value.Replace("Heater", "HeaterCooler")
-                If go.ObjectType = ObjectType.Cooler Then xdata.Element("ObjectType").Value = xdata.Element("ObjectType").Value.Replace("Cooler", "HeaterCooler")
-            End If
-            If Not go.IsConnector Then xel.Add(xdata)
-        Next
 
         xdoc.Element("DWSIM_Simulation_Data").Add(New XElement("PropertyPackages"))
         xel = xdoc.Element("DWSIM_Simulation_Data").Element("PropertyPackages")
@@ -2779,9 +2827,9 @@ Public Class FormMain
             xel.Add(New XElement("SensitivityAnalysisCase", {pp.SaveData().ToArray()}))
         Next
 
-        For Each xel1 As XElement In xdoc.Descendants
-            SharedClasses.Utility.UpdateElementForMobileXMLSaving(xel1)
-        Next
+        Parallel.ForEach(xdoc.Descendants, Sub(xel1)
+                                               SharedClasses.Utility.UpdateElementForMobileXMLSaving_CrossPlatformUI(xel1)
+                                           End Sub)
 
         xdoc.Save(path)
 
@@ -2982,17 +3030,18 @@ Public Class FormMain
 
         If IO.Path.GetExtension(simulationfilename).ToLower.Contains("dwxml") Or IO.Path.GetExtension(simulationfilename).ToLower.Contains("dwxmz") Then
             Me.UIThread(New Action(Sub()
-                                       Dim mypath As String = simulationfilename
-                                       If mypath = "" Then mypath = [path]
-                                       'process recent files list
-                                       If Not My.Settings.MostRecentFiles.Contains(mypath) Then
-                                           My.Settings.MostRecentFiles.Add(mypath)
-                                           If Not My.Application.CommandLineArgs.Count > 1 Then Me.UpdateMRUList()
+                                       If Visible Then
+                                           Dim mypath As String = simulationfilename
+                                           If mypath = "" Then mypath = [path]
+                                           'process recent files list
+                                           If Not My.Settings.MostRecentFiles.Contains(mypath) Then
+                                               My.Settings.MostRecentFiles.Add(mypath)
+                                               If Not My.Application.CommandLineArgs.Count > 1 Then Me.UpdateMRUList()
+                                           End If
+                                           form.Options.FilePath = Me.filename
+                                           form.UpdateFormText()
+                                           form.WriteToLog(DWSIM.App.GetLocalString("Arquivo") & Me.filename & DWSIM.App.GetLocalString("salvocomsucesso"), Color.Blue, MessageType.Information)
                                        End If
-                                       form.Options.FilePath = Me.filename
-                                       form.UpdateFormText()
-                                       form.WriteToLog(DWSIM.App.GetLocalString("Arquivo") & Me.filename & DWSIM.App.GetLocalString("salvocomsucesso"), Color.Blue, MessageType.Information)
-                                       'Me.ToolStripStatusLabel1.Text = ""
                                    End Sub))
         End If
 
@@ -3825,7 +3874,7 @@ Label_00CC:
         System.Diagnostics.Process.Start("https://sourceforge.net/p/dwsim/tickets/")
     End Sub
 
-    Private Sub DonateToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 
+    Private Sub DonateToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         System.Diagnostics.Process.Start("https://gumroad.com/products/PTljX")
     End Sub
 
@@ -4015,6 +4064,11 @@ Label_00CC:
             ' There was an error during the operation.
             Console.WriteLine("Error saving backup file: " & e.Error.Message)
         End If
+    End Sub
+
+    Private Sub tsbInspector_CheckedChanged(sender As Object, e As EventArgs) Handles tsbInspector.CheckedChanged
+        GlobalSettings.Settings.InspectorEnabled = tsbInspector.Checked
+        FrmOptions.chkEnableInspector.Checked = tsbInspector.Checked
     End Sub
 
 #End Region

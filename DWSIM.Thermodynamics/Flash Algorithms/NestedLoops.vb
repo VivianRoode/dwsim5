@@ -150,6 +150,7 @@ Namespace PropertyPackages.Auxiliary.FlashAlgorithms
                     IObj?.SetCurrent()
                     Vp(i) = PP.AUX_PVAPi(i, T)
                     Ki(i) = PrevKi(i)
+                    If Double.IsNaN(Ki(i)) Then Ki(i) = 1.0E+20
                 Next
             End If
 
@@ -1796,9 +1797,9 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
             itol = Me.FlashSettings(Interfaces.Enums.FlashSetting.PTFlash_Internal_Loop_Tolerance).ToDoubleFromInvariant
             maxit_i = Me.FlashSettings(Interfaces.Enums.FlashSetting.PTFlash_Maximum_Number_Of_Internal_Iterations)
 
-            epsilon = Me.FlashSettings(Interfaces.Enums.FlashSetting.PVFlash_TemperatureDerivativeEpsilon)
-            df = Me.FlashSettings(Interfaces.Enums.FlashSetting.PVFlash_FixedDampingFactor)
-            maxdT = Me.FlashSettings(Interfaces.Enums.FlashSetting.PVFlash_MaximumTemperatureChange)
+            epsilon = Me.FlashSettings(Interfaces.Enums.FlashSetting.PVFlash_TemperatureDerivativeEpsilon).ToDoubleFromInvariant
+            df = Me.FlashSettings(Interfaces.Enums.FlashSetting.PVFlash_FixedDampingFactor).ToDoubleFromInvariant
+            maxdT = Me.FlashSettings(Interfaces.Enums.FlashSetting.PVFlash_MaximumTemperatureChange).ToDoubleFromInvariant
 
             n = Vz.Length - 1
 
@@ -1893,6 +1894,11 @@ out:        WriteDebugInfo("PT Flash [NL]: Converged in " & ecount & " iteration
                     T += Vz(i) * PP.AUX_TSATi(P, i)
                 Next
                 IObj?.Close()
+                If Vz.Count = 1 Then
+                    Vx = New Double() {1.0}
+                    Vy = New Double() {1.0}
+                    Ki = New Double() {1.0}
+                End If
                 Return New Object() {L, V, Vx, Vy, T, 0, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
             End If
 

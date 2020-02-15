@@ -22,6 +22,7 @@ using StringResources = DWSIM.UI.Desktop.Shared.StringArrays;
 using DWSIM.Thermodynamics.PropertyPackages;
 using DWSIM.Interfaces.Enums;
 using DWSIM.ExtensionMethods;
+using DWSIM.Inspector;
 
 namespace DWSIM.UI.Desktop.Editors
 {
@@ -55,6 +56,18 @@ namespace DWSIM.UI.Desktop.Editors
             s.CreateAndAddLabelRow(container, "Material Stream Property Editor");
 
             s.CreateAndAddDescriptionRow(container, "Except for compound amounts, property values are updated/stored as they are changed/edited.");
+
+            if ((Host.Items.Where(x => x.Name.Contains(MatStream.GraphicObject.Tag)).Count() > 0))
+            {
+                var ctn = new DynamicLayout();
+                ctn.BackgroundColor = Colors.LightGrey;
+                s.CreateAndAddLabelRow(ctn, "Inspector Reports");
+                s.CreateAndAddLabelAndButtonRow(ctn, "An Inspector Report is ready for viewing.", "View Report", null, (btn, e) => {
+                    var f = s.GetDefaultEditorForm("Inspector Report for '" + MatStream.GraphicObject.Tag + "'", 1024, 768, Window2_Eto.GetInspectorWindow(MatStream), false);
+                    f.Show();
+                });
+                container.Add(ctn);
+            }
 
             s.CreateAndAddLabelRow(container, "Material Stream Details");
 
@@ -289,11 +302,12 @@ namespace DWSIM.UI.Desktop.Editors
 
                     var tblist = new List<TextBox>();
 
-                    foreach (var comp in ms.Phases[0].Compounds)
+                    foreach (var comp0 in ms.GetFlowsheet().SelectedCompounds.Values)
                     {
-                        var tbox = s.CreateAndAddTextBoxRow(container2, nf, comp.Key, comp.Value.MoleFraction.GetValueOrDefault(),
+                        var comp = ms.Phases[0].Compounds[comp0.Name];
+                        var tbox = s.CreateAndAddTextBoxRow(container2, nf, comp.Name, comp.MoleFraction.GetValueOrDefault(),
                                                (TextBox arg3, EventArgs ev) => { });
-                        tbox.Tag = comp.Key;
+                        tbox.Tag = comp.Name;
                         tblist.Add(tbox);
                     }
 
@@ -533,6 +547,32 @@ namespace DWSIM.UI.Desktop.Editors
                         if (GlobalSettings.Settings.CallSolverOnEditorPropertyChanged) ((Shared.Flowsheet)MatStream.GetFlowsheet()).HighLevelSolve.Invoke();
 
                     };
+
+                    s.CreateAndAddLabelAndTwoButtonsRow(container2,"Copy/Paste", "Copy Data", null, "Paste Data", null,
+                        (btn1, e1) => {
+                            string data = "";
+                            foreach (var tb in tblist)
+                            {
+                                data += tb.Tag.ToString() + "\t" + tb.Text + "\n";
+                            }
+                            Clipboard.Instance.Text = data;
+                        },
+                        (btn2, e2) => {
+                            if (Clipboard.Instance.ContainsText)
+                            {
+                                var textdata = Clipboard.Instance.Text;
+                                var data = textdata.Split(new[] { '\n', '\t', ' ' });
+                                int i = 0;
+                                foreach (var line in data)
+                                {
+                                    if (line != " " && line != "\t" && line != "\n" && i < tblist.Count)
+                                    {
+                                        tblist[i].Text = line.Trim();
+                                        i += 1;
+                                    }
+                                }
+                            }
+                        });
 
                     s.CreateAndAddControlRow(container2, btnAccept);
                     s.CreateAndAddControlRow(container2, btnNormalize);

@@ -1010,14 +1010,14 @@ Public Class GraphicsSurface
                         Select Case gObjFrom.ObjectType
                             Case ObjectType.Cooler, ObjectType.Pipe, ObjectType.Expander, ObjectType.ShortcutColumn, ObjectType.DistillationColumn, ObjectType.AbsorptionColumn,
                                 ObjectType.ReboiledAbsorber, ObjectType.RefluxedAbsorber, ObjectType.OT_EnergyRecycle, ObjectType.ComponentSeparator, ObjectType.SolidSeparator,
-                                ObjectType.Filter, ObjectType.CustomUO, ObjectType.CapeOpenUO, ObjectType.FlowsheetUO
+                                ObjectType.Filter, ObjectType.CustomUO, ObjectType.CapeOpenUO, ObjectType.FlowsheetUO, ObjectType.External
                                 GoTo 100
                             Case Else
                                 Throw New Exception("This connection is not allowed.")
                         End Select
 100:                    If gObjFrom.ObjectType <> ObjectType.CapeOpenUO And gObjFrom.ObjectType <> ObjectType.CustomUO And gObjFrom.ObjectType <> ObjectType.DistillationColumn _
-                            And gObjFrom.ObjectType <> ObjectType.AbsorptionColumn And gObjFrom.ObjectType <> ObjectType.OT_EnergyRecycle _
-                            And gObjFrom.ObjectType <> ObjectType.RefluxedAbsorber And gObjFrom.ObjectType <> ObjectType.ReboiledAbsorber Then
+                            And gObjFrom.ObjectType <> ObjectType.AbsorptionColumn And gObjFrom.ObjectType <> ObjectType.OT_EnergyRecycle And gObjFrom.ObjectType <> ObjectType.External _
+                                                        And gObjFrom.ObjectType <> ObjectType.RefluxedAbsorber And gObjFrom.ObjectType <> ObjectType.ReboiledAbsorber Then
                             If Not gObjFrom.EnergyConnector.IsAttached Then
                                 StartPos.X = gObjFrom.EnergyConnector.Position.X
                                 StartPos.Y = gObjFrom.EnergyConnector.Position.Y
@@ -1339,9 +1339,14 @@ Public Class GraphicsSurface
 
             If gobj.Owner.GetFlowsheet IsNot Nothing Then
 
+                Dim fs = gobj.Owner.GetFlowsheet
+
+                If Not fs.FlowsheetOptions.VisibleProperties.ContainsKey(gobj.Owner.GetType.Name) Then
+                    Exit Sub
+                End If
+
                 Dim count As Integer
 
-                Dim fs = gobj.Owner.GetFlowsheet
                 Dim props As New List(Of String)(fs.FlowsheetOptions.VisibleProperties(gobj.Owner.GetType.Name))
                 props.AddRange(DirectCast(gobj.Owner.ExtraProperties, IDictionary(Of String, Object)).Keys.ToArray)
 
@@ -1413,5 +1418,11 @@ Public Class GraphicsSurface
         Return New SKSize(trect.Width, trect.Height)
 
     End Function
+
+    Public Sub AutoArrange(Optional ByVal DistanceFactor As Double = 1.0)
+
+
+
+    End Sub
 
 End Class

@@ -21,6 +21,8 @@
 ''' </summary>
 <InterfaceType(ComInterfaceType.InterfaceIsIDispatch)> Public Interface ICompoundConstantProperties
 
+    Property ExtraProperties As Dynamic.ExpandoObject
+
     Property Name As String
     Property CAS_Number As String
     Property Formula As String
@@ -236,5 +238,8 @@
     Property LennardJonesEnergy As Double
     Property Parachor As Double
     Property FullerDiffusionVolume As Double
+
+    'for custom ordering purposes
+    Property Tag As String
 
 End Interface

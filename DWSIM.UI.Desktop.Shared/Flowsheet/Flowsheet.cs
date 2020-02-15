@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using DWSIM.Interfaces;
+using DWSIM.Interfaces.Enums.GraphicObjects;
 using Eto.Forms;
 using iTextSharp.text;
 
@@ -43,7 +44,9 @@ namespace DWSIM.UI.Desktop.Shared
 
         public override Interfaces.IFlowsheet GetNewInstance()
         {
-            return new Flowsheet();
+            var fs = new Flowsheet();
+            fs.Initialize();
+            return fs;
         }
 
         public override void UpdateInformation()

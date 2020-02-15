@@ -23,6 +23,7 @@ Imports Microsoft.Scripting.Hosting
 Imports System.Text
 Imports DWSIM.SharedClasses.Flowsheet
 Imports System.Dynamic
+Imports DWSIM.Interfaces.Enums
 
 <System.Runtime.InteropServices.ComVisible(True)> Public MustInherit Class FlowsheetBase
 
@@ -43,6 +44,8 @@ Imports System.Dynamic
     Public Property AvailableFlashAlgorithms As New Dictionary(Of String, IFlashAlgorithm) Implements IFlowsheet.AvailableFlashAlgorithms
 
     Public Property AvailableSystemsOfUnits As New List(Of IUnitsOfMeasure) Implements IFlowsheet.AvailableSystemsOfUnits
+
+    Public Property ExternalUnitOperations As New Dictionary(Of String, IExternalUnitOperation)
 
     Private loaded As Boolean = False
 
@@ -316,7 +319,30 @@ Imports System.Dynamic
 
     Public Property SelectedCompounds As Dictionary(Of String, ICompoundConstantProperties) Implements IFlowsheet.SelectedCompounds
         Get
-            Return Options.SelectedComponents
+            Select Case Options.CompoundOrderingMode
+                Case CompoundOrdering.CAS_ASC
+                    Return Options.SelectedComponents.OrderBy(Function(c) c.Value.CAS_Number).ToDictionary(Of String, ICompoundConstantProperties)(Function(k) k.Key, Function(k) k.Value)
+                Case CompoundOrdering.CAS_DESC
+                    Return Options.SelectedComponents.OrderByDescending(Function(c) c.Value.CAS_Number).ToDictionary(Of String, ICompoundConstantProperties)(Function(k) k.Key, Function(k) k.Value)
+                Case CompoundOrdering.MW_ASC
+                    Return Options.SelectedComponents.OrderBy(Function(c) c.Value.Molar_Weight).ToDictionary(Of String, ICompoundConstantProperties)(Function(k) k.Key, Function(k) k.Value)
+                Case CompoundOrdering.MW_DESC
+                    Return Options.SelectedComponents.OrderByDescending(Function(c) c.Value.Molar_Weight).ToDictionary(Of String, ICompoundConstantProperties)(Function(k) k.Key, Function(k) k.Value)
+                Case CompoundOrdering.Name_ASC
+                    Return Options.SelectedComponents.OrderBy(Function(c) c.Value.Name).ToDictionary(Of String, ICompoundConstantProperties)(Function(k) k.Key, Function(k) k.Value)
+                Case CompoundOrdering.Name_DESC
+                    Return Options.SelectedComponents.OrderByDescending(Function(c) c.Value.Name).ToDictionary(Of String, ICompoundConstantProperties)(Function(k) k.Key, Function(k) k.Value)
+                Case CompoundOrdering.NBP_ASC
+                    Return Options.SelectedComponents.OrderBy(Function(c) c.Value.NBP.GetValueOrDefault).ToDictionary(Of String, ICompoundConstantProperties)(Function(k) k.Key, Function(k) k.Value)
+                Case CompoundOrdering.NBP_DESC
+                    Return Options.SelectedComponents.OrderByDescending(Function(c) c.Value.NBP.GetValueOrDefault).ToDictionary(Of String, ICompoundConstantProperties)(Function(k) k.Key, Function(k) k.Value)
+                Case CompoundOrdering.TAG_ASC
+                    Return Options.SelectedComponents.OrderBy(Function(c) c.Value.Tag).ToDictionary(Of String, ICompoundConstantProperties)(Function(k) k.Key, Function(k) k.Value)
+                Case CompoundOrdering.TAG_DESC
+                    Return Options.SelectedComponents.OrderByDescending(Function(c) c.Value.Tag).ToDictionary(Of String, ICompoundConstantProperties)(Function(k) k.Key, Function(k) k.Value)
+                Case Else
+                    Return Options.SelectedComponents
+            End Select
         End Get
         Set(value As Dictionary(Of String, ICompoundConstantProperties))
             Options.SelectedComponents = value
@@ -481,13 +507,27 @@ Imports System.Dynamic
 
     End Function
 
-    Public Function AddObjectToSurface(ByVal type As ObjectType, ByVal x As Integer, ByVal y As Integer, Optional ByVal tag As String = "", Optional ByVal id As String = "") As String
+    Public Function AddObjectToSurface(ByVal type As ObjectType, ByVal x As Integer, ByVal y As Integer, Optional ByVal tag As String = "", Optional ByVal id As String = "", Optional ByVal uoobj As IExternalUnitOperation = Nothing) As String
 
         Dim gObj As IGraphicObject = Nothing
         Dim mpx = x '- SplitContainer1.SplitterDistance
         Dim mpy = y '- ToolStripContainer1.TopToolStripPanel.Height
 
         Select Case type
+
+            Case ObjectType.External
+
+                Dim myNode As New ExternalUnitOperationGraphic(mpx, mpy, 40, 40)
+                myNode.Tag = uoobj.Prefix & SimulationObjects.Count.ToString("00#")
+                If tag <> "" Then myNode.Tag = tag
+                gObj = myNode
+                gObj.Name = Guid.NewGuid.ToString
+                If id <> "" Then gObj.Name = id
+                DirectCast(uoobj, ISimulationObject).Name = gObj.Name
+                GraphicObjects.Add(gObj.Name, myNode)
+                DirectCast(uoobj, ISimulationObject).GraphicObject = myNode
+                myNode.CreateConnectors(0, 0)
+                SimulationObjects.Add(myNode.Name, uoobj)
 
             Case ObjectType.OT_Adjust
 
@@ -1011,7 +1051,6 @@ Imports System.Dynamic
 
     End Sub
 
-
     Public Sub LoadFromXML(xdoc As XDocument) Implements IFlowsheet.LoadFromXML
 
         Dim ci As CultureInfo = CultureInfo.InvariantCulture
@@ -1177,10 +1216,17 @@ Imports System.Dynamic
             Try
                 Dim id As String = xel.<Name>.Value
                 Dim obj As ISimulationObject = Nothing
-                If xel.Element("Type").Value.Contains("MaterialStream") Then
+                If xel.Element("Type").Value.Contains("Streams.MaterialStream") Then
                     obj = CType(New RaoultPropertyPackage().ReturnInstance(xel.Element("Type").Value), ISimulationObject)
                 Else
-                    obj = CType(UnitOperations.ReturnInstance(xel.Element("Type").Value), ISimulationObject)
+                    Dim uokey As String = xel.Element("ComponentDescription").Value
+                    If ExternalUnitOperations.ContainsKey(uokey) Then
+                        RunCodeOnUIThread(Sub()
+                                              obj = ExternalUnitOperations(uokey).ReturnInstance(xel.Element("Type").Value)
+                                          End Sub)
+                    Else
+                        obj = CType(UnitOperations.ReturnInstance(xel.Element("Type").Value), ISimulationObject)
+                    End If
                 End If
                 Dim gobj As IGraphicObject = (From go As IGraphicObject In
                                     FlowsheetSurface.DrawingObjects Where go.Name = id).SingleOrDefault
@@ -1523,6 +1569,15 @@ Imports System.Dynamic
                     ElseIf TypeOf obj Is RigorousColumnGraphic Or TypeOf obj Is AbsorptionColumnGraphic Or TypeOf obj Is CAPEOPENGraphic Then
                         obj.CreateConnectors(xel.Element("InputConnectors").Elements.Count, xel.Element("OutputConnectors").Elements.Count)
                         obj.PositionConnectors()
+                    ElseIf TypeOf obj Is ExternalUnitOperationGraphic Then
+                        Dim euo = ExternalUnitOperations.Values.Where(Function(x) x.Description = obj.Description).FirstOrDefault
+                        If euo IsNot Nothing Then
+                            obj.Owner = euo
+                            DirectCast(euo, Interfaces.ISimulationObject).GraphicObject = obj
+                            obj.CreateConnectors(0, 0)
+                            obj.Owner = Nothing
+                            DirectCast(euo, Interfaces.ISimulationObject).GraphicObject = Nothing
+                        End If
                     Else
                         If obj.Name = "" Then obj.Name = obj.Tag
                         obj.CreateConnectors(0, 0)
@@ -1537,14 +1592,13 @@ Imports System.Dynamic
             End Try
         Next
 
+
         For Each xel As XElement In data
             Try
                 Dim id As String = pkey & xel.Element("Name").Value
                 If id <> "" Then
-                    Dim obj As IGraphicObject = (From go As IGraphicObject In
-                                                            FlowsheetSurface.DrawingObjects Where go.Name = id).SingleOrDefault
-                    If obj Is Nothing Then obj = (From go As IGraphicObject In
-                                                                                    FlowsheetSurface.DrawingObjects Where go.Name = xel.Element("Name").Value).SingleOrDefault
+                    Dim obj As IGraphicObject = (From go As IGraphicObject In FlowsheetSurface.DrawingObjects Where go.Name = id).SingleOrDefault
+                    If obj Is Nothing Then obj = (From go As IGraphicObject In FlowsheetSurface.DrawingObjects Where go.Name = xel.Element("Name").Value).SingleOrDefault
                     If Not obj Is Nothing Then
                         If xel.Element("InputConnectors") IsNot Nothing Then
                             Dim i As Integer = 0
@@ -1553,8 +1607,7 @@ Imports System.Dynamic
                                     obj.InputConnectors(i).ConnectorName = pkey & xel2.@AttachedFromObjID & "|" & xel2.@AttachedFromConnIndex
                                     obj.InputConnectors(i).Type = CType([Enum].Parse(obj.InputConnectors(i).Type.GetType, xel2.@ConnType), ConType)
                                     If reconnectinlets Then
-                                        Dim objFrom As IGraphicObject = (From go As IGraphicObject In
-                                                                                   FlowsheetSurface.DrawingObjects Where go.Name = xel2.@AttachedFromObjID).SingleOrDefault
+                                        Dim objFrom As IGraphicObject = (From go As IGraphicObject In FlowsheetSurface.DrawingObjects Where go.Name = xel2.@AttachedFromObjID).SingleOrDefault
                                         If Not objFrom Is Nothing Then
                                             If Not objFrom.OutputConnectors(CInt(xel2.@AttachedFromConnIndex)).IsAttached Then
                                                 FlowsheetSurface.ConnectObject(CType(objFrom, GraphicObject), CType(obj, GraphicObject), CInt(xel2.@AttachedFromConnIndex), CInt(xel2.@AttachedToConnIndex))
@@ -1576,18 +1629,15 @@ Imports System.Dynamic
             Try
                 Dim id As String = pkey & xel.Element("Name").Value
                 If id <> "" Then
-                    Dim obj As IGraphicObject = (From go As IGraphicObject In
-                                                            FlowsheetSurface.DrawingObjects Where go.Name = id).SingleOrDefault
+                    Dim obj As IGraphicObject = (From go As IGraphicObject In FlowsheetSurface.DrawingObjects Where go.Name = id).SingleOrDefault
                     If Not obj Is Nothing Then
                         If xel.Element("OutputConnectors") IsNot Nothing Then
                             For Each xel2 As XElement In xel.Element("OutputConnectors").Elements
                                 If CBool(xel2.@IsAttached) = True Then
                                     Dim objToID = pkey & xel2.@AttachedToObjID
                                     If objToID <> "" Then
-                                        Dim objTo As IGraphicObject = (From go As IGraphicObject In
-                                                                                    FlowsheetSurface.DrawingObjects Where go.Name = objToID).SingleOrDefault
-                                        If objTo Is Nothing Then objTo = (From go As IGraphicObject In
-                                                                                    FlowsheetSurface.DrawingObjects Where go.Name = xel2.@AttachedToObjID).SingleOrDefault
+                                        Dim objTo As IGraphicObject = (From go As IGraphicObject In FlowsheetSurface.DrawingObjects Where go.Name = objToID).SingleOrDefault
+                                        If objTo Is Nothing Then objTo = (From go As IGraphicObject In FlowsheetSurface.DrawingObjects Where go.Name = xel2.@AttachedToObjID).SingleOrDefault
                                         Dim fromidx As Integer = -1
                                         Dim cp As IConnectionPoint = (From cp2 As IConnectionPoint In objTo.InputConnectors Select cp2 Where cp2.ConnectorName.Split("|"c)(0) = obj.Name).SingleOrDefault
                                         If cp Is Nothing Then cp = (From cp2 As IConnectionPoint In objTo.InputConnectors Select cp2 Where cp2.ConnectorName.Split("|"c)(0) = xel2.@AttachedToObjID).SingleOrDefault
@@ -1710,6 +1760,7 @@ Imports System.Dynamic
         FlowsheetSurface.DrawFloatingTable = Options.DisplayFloatingPropertyTables
 
         AddPropPacks()
+        AddExternalUOs()
         AddFlashAlgorithms()
 
         Dim fa As New Thermodynamics.PropertyPackages.Auxiliary.FlashAlgorithms.NestedLoops()
@@ -1894,6 +1945,44 @@ Label_00CC:
 
     End Function
 
+    Public Shared Function LoadZippedXMLDoc(pathtofile As String) As XDocument
+
+        Dim pathtosave As String = My.Computer.FileSystem.SpecialDirectories.Temp + Path.DirectorySeparatorChar
+        Dim fullname As String = ""
+
+        Using stream As ZipInputStream = New ZipInputStream(File.OpenRead(pathtofile))
+            stream.Password = Nothing
+            Dim entry As ZipEntry
+Label_00CC:
+            entry = stream.GetNextEntry()
+            Do While (Not entry Is Nothing)
+                Dim fileName As String = Path.GetFileName(entry.Name)
+                If (fileName <> String.Empty) Then
+                    Using stream2 As FileStream = File.Create(pathtosave + Path.GetFileName(entry.Name))
+                        Dim count As Integer = 2048
+                        Dim buffer As Byte() = New Byte(2048) {}
+                        Do While True
+                            count = stream.Read(buffer, 0, buffer.Length)
+                            If (count <= 0) Then
+                                fullname = pathtosave + Path.GetFileName(entry.Name)
+                                GoTo Label_00CC
+                            End If
+                            stream2.Write(buffer, 0, count)
+                        Loop
+                    End Using
+                End If
+                entry = stream.GetNextEntry
+            Loop
+        End Using
+
+        Dim xdoc = XDocument.Load(fullname)
+        File.Delete(fullname)
+
+        Return xdoc
+
+    End Function
+
+
     Shared Function IsZipFilePasswordProtected(ByVal ZipFile As String) As Boolean
         Using fsIn As New FileStream(ZipFile, FileMode.Open, FileAccess.Read)
             Using zipInStream As New ZipInputStream(fsIn)
@@ -1991,13 +2080,13 @@ Label_00CC:
         LKPPP.ComponentName = "Lee-Kesler-Plöcker"
         AvailablePropertyPackages.Add(LKPPP.ComponentName.ToString, LKPPP)
 
-        Dim EUQPP As ExUNIQUACPropertyPackage = New ExUNIQUACPropertyPackage()
-        EUQPP.ComponentName = "Extended UNIQUAC (Aqueous Electrolytes)"
-        AvailablePropertyPackages.Add(EUQPP.ComponentName.ToString, EUQPP)
+        'Dim EUQPP As ExUNIQUACPropertyPackage = New ExUNIQUACPropertyPackage()
+        'EUQPP.ComponentName = "Extended UNIQUAC (Aqueous Electrolytes)"
+        'AvailablePropertyPackages.Add(EUQPP.ComponentName.ToString, EUQPP)
 
-        Dim ENQPP As New ElectrolyteNRTLPropertyPackage()
-        ENQPP.ComponentName = "Electrolyte NRTL (Aqueous Electrolytes)"
-        AvailablePropertyPackages.Add(ENQPP.ComponentName.ToString, ENQPP)
+        'Dim ENQPP As New ElectrolyteNRTLPropertyPackage()
+        'ENQPP.ComponentName = "Electrolyte NRTL (Aqueous Electrolytes)"
+        'AvailablePropertyPackages.Add(ENQPP.ComponentName.ToString, ENQPP)
 
         Dim BOPP As BlackOilPropertyPackage = New BlackOilPropertyPackage()
         BOPP.ComponentName = "Black Oil"
@@ -2017,6 +2106,17 @@ Label_00CC:
         End If
 
     End Sub
+
+    Sub AddExternalUOs()
+
+        Dim otheruos = SharedClasses.Utility.LoadAdditionalUnitOperations()
+
+        For Each uo In otheruos
+            ExternalUnitOperations.Add(uo.Description, uo)
+        Next
+
+    End Sub
+
 
     Function GetPropertyPackages(ByVal assmbly As Assembly) As List(Of Interfaces.IPropertyPackage)
 

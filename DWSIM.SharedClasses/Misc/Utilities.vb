@@ -3,6 +3,40 @@ Imports System.IO
 
 Public Class Utility
 
+    Shared Function GetSimulationFileDetails(xdoc As XDocument) As Dictionary(Of String, String)
+
+        Dim props As New Dictionary(Of String, String)
+
+        'check version
+
+        Dim sver = New Version("1.0.0.0")
+
+        Try
+            props.Add("DWSIMVersion", xdoc.Element("DWSIM_Simulation_Data").Element("GeneralInfo").Element("BuildVersion").Value)
+            props.Add("OSInfo", xdoc.Element("DWSIM_Simulation_Data").Element("GeneralInfo").Element("OSInfo").Value)
+            props.Add("SavedOn", xdoc.Element("DWSIM_Simulation_Data").Element("GeneralInfo").Element("SavedOn").Value)
+        Catch ex As Exception
+        End Try
+        Try
+            props.Add("SimName", xdoc.Element("DWSIM_Simulation_Data").Element("Settings").Element("SimulationName").Value)
+        Catch ex As Exception
+            props.Add("SimName", "")
+        End Try
+        Try
+            props.Add("SimAuthor", xdoc.Element("DWSIM_Simulation_Data").Element("Settings").Element("SimulationAuthor").Value)
+        Catch ex As Exception
+            props.Add("SimAuthor", "")
+        End Try
+
+        props.Add("Compounds", xdoc.Element("DWSIM_Simulation_Data").Element("Compounds").Elements.Count)
+        props.Add("PropertyPackages", xdoc.Element("DWSIM_Simulation_Data").Element("PropertyPackages").Elements.Count)
+        props.Add("SimulationObjects", xdoc.Element("DWSIM_Simulation_Data").Element("SimulationObjects").Elements.Count)
+        props.Add("Reactions", xdoc.Element("DWSIM_Simulation_Data").Element("Reactions").Elements.Count)
+
+        Return props
+
+    End Function
+
     Shared Sub UpdateElement(xel As XElement)
 
         If xel.Name = "TipoObjeto" Then xel.Name = "ObjectType"
@@ -334,6 +368,10 @@ Public Class Utility
             xel.Value = xel.Value.Replace("PortableFlowsheetDrawing.GraphicObjects.Tables", "DWSIM.Drawing.SkiaSharp.GraphicObjects.Tables")
         End If
 
+        If xel.Value.Contains("PortableFlowsheetDrawing.GraphicObjects.TableGraphic") And xel.Name = "Type" Then
+            xel.Value = xel.Value.Replace("PortableFlowsheetDrawing.GraphicObjects.TableGraphic", "DWSIM.Drawing.SkiaSharp.GraphicObjects.Tables.TableGraphic")
+        End If
+
         If xel.Value.EndsWith("Streams.MaterialStream") Then xel.Value = "DWSIM.Thermodynamics.Streams.MaterialStream"
         If xel.Value.EndsWith("Streams.EnergyStream") Then xel.Value = "DWSIM.UnitOperations.Streams.EnergyStream"
 
@@ -441,12 +479,36 @@ Public Class Utility
             xel.Value = "PortableFlowsheetDrawing.GraphicObjects.Shapes.CompressorExpanderGraphic"
         End If
 
+        If xel.Value.StartsWith("DWSIM.Thermodynamics.BaseClasses") And xel.Name = "Type" Then
+            xel.Value = xel.Value.Replace("DWSIM.Thermodynamics.BaseClasses", "PortableSharedClasses.BaseClasses")
+        End If
+
+        If xel.Value.StartsWith("DWSIM.Thermodynamics.BaseClasses.PhaseProperties") And xel.Name = "Type" Then
+            xel.Value = xel.Value.Replace("DWSIM.Thermodynamics.BaseClasses.PhaseProperties", "PortableSharedClasses.BaseClasses.PhaseProperties")
+        End If
+
         If xel.Value.StartsWith("DWSIM.Thermodynamics.PropertyPackages") And xel.Name = "Type" Then
             xel.Value = xel.Value.Replace("DWSIM.Thermodynamics.PropertyPackages", "PortableDTL.DTL.SimulationObjects.PropertyPackages")
         End If
 
-        If xel.Value.StartsWith("DWSIM.DrawingTools.GraphicObjects") And xel.Name = "Type" Then
-            xel.Value = xel.Value.Replace("DWSIM.DrawingTools.GraphicObjects", "DWSIM.Drawing.SkiaSharp.GraphicObjects.Shapes")
+        If xel.Value.Contains("DWSIM.Drawing.SkiaSharp.GraphicObjects.Tables.TableGraphic") And xel.Name = "Type" Then
+            xel.Value = xel.Value.Replace("DWSIM.Drawing.SkiaSharp.GraphicObjects.Tables.TableGraphic", "PortableFlowsheetDrawing.GraphicObjects.TableGraphic")
+        End If
+
+        If xel.Value.StartsWith("DWSIM.Drawing.SkiaSharp.GraphicObjects.Tables") And xel.Name = "Type" Then
+            xel.Value = xel.Value.Replace("DWSIM.Drawing.SkiaSharp.GraphicObjects.Tables", "PortableFlowsheetDrawing.GraphicObjects")
+        End If
+
+        If xel.Value.StartsWith("DWSIM.Drawing.SkiaSharp") And xel.Name = "Type" Then
+            xel.Value = xel.Value.Replace("DWSIM.Drawing.SkiaSharp", "PortableFlowsheetDrawing")
+        End If
+
+        If xel.Value.StartsWith("DWSIM.DrawingTools") And xel.Name = "Type" Then
+            xel.Value = xel.Value.Replace("DWSIM.DrawingTools", "PortableFlowsheetDrawing")
+        End If
+
+        If xel.Value.StartsWith("DWSIM.SharedClasses") And xel.Name = "Type" Then
+            xel.Value = xel.Value.Replace("DWSIM.SharedClasses", "PortableSharedClasses")
         End If
 
         If xel.Value.Equals("DWSIM.Thermodynamics.Streams.MaterialStream") Then xel.Value = "PortableDTL.DTL.SimulationObjects.Streams.MaterialStream"
@@ -468,11 +530,11 @@ Public Class Utility
         If xel.Value.Equals("DWSIM.UnitOperations.UnitOperations.DistillationColumn") Then xel.Value = "PortableDTL.DTL.SimulationObjects.UnitOperations.DistillationColumn"
         If xel.Value.Equals("DWSIM.UnitOperations.UnitOperations.AbsorptionColumn") Then xel.Value = "PortableDTL.DTL.SimulationObjects.UnitOperations.AbsorptionColumn"
 
-        If xel.Value.Equals("DWSIM.UnitOperations.Reactors.Reactor_Conversion") Then xel.Value = "PortableDTL.DTL.SimulationObjects.Reactors.Reactor_Conversion"
-        If xel.Value.Equals("DWSIM.UnitOperations.Reactors.Reactor_Equilibrium") Then xel.Value = "PortableDTL.DTL.SimulationObjects.Reactors.Reactor_Equilibrium"
-        If xel.Value.Equals("DWSIM.UnitOperations.Reactors.Reactor_PFR") Then xel.Value = "PortableDTL.DTL.SimulationObjects.Reactors.Reactor_PFR"
-        If xel.Value.Equals("DWSIM.UnitOperations.Reactors.Reactor_CSTR") Then xel.Value = "PortableDTL.DTL.SimulationObjects.Reactors.Reactor_CSTR"
-        If xel.Value.Equals("DWSIM.UnitOperations.Reactors.Reactor_Gibbs") Then xel.Value = "PortableDTL.DTL.SimulationObjects.Reactors.Reactor_Gibbs"
+        If xel.Value.Equals("DWSIM.UnitOperations.Reactors.Reactor_Conversion") Then xel.Value = "PortableDTL.Reactors.Reactor_Conversion"
+        If xel.Value.Equals("DWSIM.UnitOperations.Reactors.Reactor_Equilibrium") Then xel.Value = "PortableDTL.Reactors.Reactor_Equilibrium"
+        If xel.Value.Equals("DWSIM.UnitOperations.Reactors.Reactor_PFR") Then xel.Value = "PortableDTL.Reactors.Reactor_PFR"
+        If xel.Value.Equals("DWSIM.UnitOperations.Reactors.Reactor_CSTR") Then xel.Value = "PortableDTL.Reactors.Reactor_CSTR"
+        If xel.Value.Equals("DWSIM.UnitOperations.Reactors.Reactor_Gibbs") Then xel.Value = "PortableDTL.DTL.Reactors.Reactor_Gibbs"
 
         If xel.Value.Equals("DWSIM.UnitOperations.SpecialOps.Adjust") Then xel.Value = "PortableDTL.DTL.SimulationObjects.UnitOperations.Adjust"
         If xel.Value.Equals("DWSIM.UnitOperations.SpecialOps.Recycle") Then xel.Value = "PortableDTL.DTL.SimulationObjects.UnitOperations.Recycle"
@@ -509,6 +571,28 @@ Public Class Utility
         End If
 
         Return report
+
+    End Function
+
+    Shared Function LoadAdditionalUnitOperations() As List(Of IExternalUnitOperation)
+
+        Dim euos As New List(Of IExternalUnitOperation)
+
+        Dim ppath As String = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly.Location), "unitops")
+        If Directory.Exists(ppath) Then
+            Try
+                Dim otheruos As String() = Directory.GetFiles(ppath, "*.dll", SearchOption.TopDirectoryOnly)
+                For Each fpath In otheruos
+                    Dim pplist As List(Of Interfaces.IExternalUnitOperation) = GetUnitOperations(Assembly.LoadFile(fpath))
+                    For Each pp In pplist
+                        euos.Add(pp)
+                    Next
+                Next
+            Catch ex As Exception
+            End Try
+        End If
+
+        Return euos
 
     End Function
 
@@ -563,6 +647,31 @@ Public Class Utility
         Dim ppList As List(Of Type) = availableTypes.FindAll(Function(t) t.GetInterfaces().Contains(GetType(Interfaces.IPropertyPackage)) And Not t.IsAbstract)
 
         Return ppList.ConvertAll(Of Interfaces.IPropertyPackage)(Function(t As Type) TryCast(Activator.CreateInstance(t), Interfaces.IPropertyPackage))
+
+    End Function
+
+    Shared Function GetUnitOperations(ByVal assmbly As Assembly) As List(Of Interfaces.IExternalUnitOperation)
+
+        Dim availableTypes As New List(Of Type)()
+
+        Try
+            availableTypes.AddRange(assmbly.GetTypes())
+        Catch ex As Exception
+            Console.WriteLine("Error loading types from assembly '" + assmbly.FullName + "': " + ex.ToString)
+        End Try
+
+        Dim ppList As List(Of Type) = availableTypes.FindAll(Function(t) t.GetInterfaces().Contains(GetType(Interfaces.IExternalUnitOperation)) And Not t.IsAbstract)
+
+        Dim list As New List(Of IExternalUnitOperation)
+
+        For Each item In ppList
+            Dim obj = Activator.CreateInstance(item)
+            If TryCast(obj, IExternalUnitOperation) IsNot Nothing Then
+                list.Add(obj)
+            End If
+        Next
+
+        Return list
 
     End Function
 

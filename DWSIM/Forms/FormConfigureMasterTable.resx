@@ -125,13 +125,13 @@
     <value>15</value>
   </data>
   <data name="&gt;&gt;cbOrderBy.ZOrder" xml:space="preserve">
-    <value>11</value>
+    <value>14</value>
   </data>
   <data name="&gt;&gt;Label3.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
   <data name="&gt;&gt;btnOrderUp.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>10</value>
   </data>
   <data name="Label3.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
@@ -139,18 +139,30 @@
   <data name="&gt;&gt;lblOrder.Type" xml:space="preserve">
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="nupLines.TabIndex" type="System.Int32, mscorlib">
+    <value>19</value>
+  </data>
+  <data name="&gt;&gt;Button6.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
   <data name="&gt;&gt;ColumnHeader1.Type" xml:space="preserve">
     <value>System.Windows.Forms.ColumnHeader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;cbObjectType.ZOrder" xml:space="preserve">
-    <value>15</value>
+    <value>18</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="Button3.Size" type="System.Drawing.Size, System.Drawing">
     <value>133, 23</value>
   </data>
+  <data name="Button6.Size" type="System.Drawing.Size, System.Drawing">
+    <value>133, 42</value>
+  </data>
+  <data name="&gt;&gt;Button6.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="btnOrderUp.Location" type="System.Drawing.Point, System.Drawing">
-    <value>91, 332</value>
+    <value>91, 364</value>
   </data>
   <data name="cbOrderBy.Location" type="System.Drawing.Point, System.Drawing">
     <value>454, 44</value>
@@ -159,13 +171,16 @@
     <value>ColumnHeader2</value>
   </data>
   <data name="lblOrder.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 338</value>
+    <value>10, 370</value>
   </data>
   <data name="Button5.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 238</value>
+    <value>12, 270</value>
+  </data>
+  <data name="&gt;&gt;Label5.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;Button4.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>3</value>
   </data>
   <data name="lvProps.Location" type="System.Drawing.Point, System.Drawing">
     <value>318, 75</value>
@@ -183,13 +198,16 @@
     <value>Button5</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>617, 366</value>
+    <value>617, 399</value>
   </data>
   <data name="btnOrderUp.TabIndex" type="System.Int32, mscorlib">
     <value>10</value>
   </data>
   <data name="Label3.Text" xml:space="preserve">
     <value>Ordenar por</value>
+  </data>
+  <data name="Label5.Text" xml:space="preserve">
+    <value>Linhas</value>
   </data>
   <data name="Label1.Location" type="System.Drawing.Point, System.Drawing">
     <value>10, 47</value>
@@ -204,7 +222,7 @@
     <value>2</value>
   </data>
   <data name="&gt;&gt;Label2.ZOrder" xml:space="preserve">
-    <value>14</value>
+    <value>17</value>
   </data>
   <data name="lblOrder.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -238,13 +256,16 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;Button5.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>4</value>
   </data>
   <data name="Label3.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
   <data name="Label4.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
+  </data>
+  <data name="&gt;&gt;nupLines.ZOrder" xml:space="preserve">
+    <value>1</value>
   </data>
   <data name="&gt;&gt;Label4.Name" xml:space="preserve">
     <value>Label4</value>
@@ -265,7 +286,7 @@
     <value>12, 124</value>
   </data>
   <data name="&gt;&gt;btnOrderDown.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>9</value>
   </data>
   <data name="&gt;&gt;Button1.Type" xml:space="preserve">
     <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -273,8 +294,17 @@
   <data name="&gt;&gt;Button2.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
+  <data name="&gt;&gt;Button6.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
   <data name="&gt;&gt;cbOrderBy.Type" xml:space="preserve">
     <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="Label5.Location" type="System.Drawing.Point, System.Drawing">
+    <value>10, 341</value>
+  </data>
+  <data name="&gt;&gt;Button6.Name" xml:space="preserve">
+    <value>Button6</value>
   </data>
   <data name="lblOrder.TabIndex" type="System.Int32, mscorlib">
     <value>12</value>
@@ -284,6 +314,12 @@
   </data>
   <data name="Button5.TabIndex" type="System.Int32, mscorlib">
     <value>16</value>
+  </data>
+  <data name="&gt;&gt;Label5.Name" xml:space="preserve">
+    <value>Label5</value>
+  </data>
+  <data name="Button6.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 211</value>
   </data>
   <data name="btnOrderUp.Text" xml:space="preserve">
     <value>˄</value>
@@ -295,7 +331,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;Label1.ZOrder" xml:space="preserve">
-    <value>16</value>
+    <value>19</value>
   </data>
   <data name="&gt;&gt;Button2.Type" xml:space="preserve">
     <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -324,6 +360,9 @@
   <data name="&gt;&gt;cbObjectType.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
+  <data name="Button6.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
   <data name="&gt;&gt;Label2.Name" xml:space="preserve">
     <value>Label2</value>
   </data>
@@ -340,7 +379,7 @@
     <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="btnOrderDown.Location" type="System.Drawing.Point, System.Drawing">
-    <value>121, 332</value>
+    <value>121, 364</value>
   </data>
   <data name="btnOrderDown.Text" xml:space="preserve">
     <value>˅</value>
@@ -361,13 +400,16 @@
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;TextBox1.ZOrder" xml:space="preserve">
-    <value>8</value>
+    <value>11</value>
   </data>
   <data name="lblOrder.Text" xml:space="preserve">
     <value>Ordenar</value>
   </data>
   <data name="Label1.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
+  </data>
+  <data name="Button6.TabIndex" type="System.Int32, mscorlib">
+    <value>20</value>
   </data>
   <data name="&gt;&gt;Label1.Parent" xml:space="preserve">
     <value>$this</value>
@@ -379,7 +421,10 @@
     <value>Button1</value>
   </data>
   <data name="&gt;&gt;Button1.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>7</value>
+  </data>
+  <data name="&gt;&gt;nupLines.Parent" xml:space="preserve">
+    <value>$this</value>
   </data>
   <data name="&gt;&gt;lvProps.Parent" xml:space="preserve">
     <value>$this</value>
@@ -400,10 +445,10 @@
     <value>7</value>
   </data>
   <data name="&gt;&gt;lvObjects.ZOrder" xml:space="preserve">
-    <value>10</value>
+    <value>13</value>
   </data>
   <data name="lvObjects.Size" type="System.Drawing.Size, System.Drawing">
-    <value>161, 281</value>
+    <value>161, 312</value>
   </data>
   <data name="cbObjectType.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -418,16 +463,19 @@
     <value>lblOrder</value>
   </data>
   <data name="&gt;&gt;Button2.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>6</value>
   </data>
   <data name="Button2.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
   <data name="&gt;&gt;Label4.ZOrder" xml:space="preserve">
-    <value>9</value>
+    <value>12</value>
   </data>
   <data name="lvObjects.Location" type="System.Drawing.Point, System.Drawing">
     <value>151, 75</value>
+  </data>
+  <data name="Label5.Size" type="System.Drawing.Size, System.Drawing">
+    <value>38, 13</value>
   </data>
   <data name="Label2.Location" type="System.Drawing.Point, System.Drawing">
     <value>10, 82</value>
@@ -453,6 +501,9 @@
   <data name="&gt;&gt;Button3.Name" xml:space="preserve">
     <value>Button3</value>
   </data>
+  <data name="nupLines.Size" type="System.Drawing.Size, System.Drawing">
+    <value>54, 20</value>
+  </data>
   <data name="btnOrderDown.Enabled" type="System.Boolean, mscorlib">
     <value>False</value>
   </data>
@@ -460,19 +511,22 @@
     <value>17</value>
   </data>
   <data name="Button4.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 267</value>
+    <value>12, 299</value>
   </data>
   <data name="Label1.Text" xml:space="preserve">
     <value>Mostrar objetos do tipo</value>
   </data>
   <data name="&gt;&gt;Button3.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>5</value>
   </data>
   <data name="lblOrder.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
   <data name="&gt;&gt;Label4.Type" xml:space="preserve">
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;nupLines.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="Label4.Location" type="System.Drawing.Point, System.Drawing">
     <value>12, 12</value>
@@ -495,6 +549,9 @@
   <data name="&gt;&gt;Label1.Type" xml:space="preserve">
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="Label5.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
   <data name="&gt;&gt;Label2.Type" xml:space="preserve">
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -502,10 +559,10 @@
     <value>NoControl</value>
   </data>
   <data name="&gt;&gt;Label3.ZOrder" xml:space="preserve">
-    <value>12</value>
+    <value>15</value>
   </data>
   <data name="lvProps.Size" type="System.Drawing.Size, System.Drawing">
-    <value>290, 281</value>
+    <value>290, 312</value>
   </data>
   <data name="Button1.Size" type="System.Drawing.Size, System.Drawing">
     <value>133, 23</value>
@@ -525,8 +582,14 @@
   <data name="&gt;&gt;cbObjectType.Name" xml:space="preserve">
     <value>cbObjectType</value>
   </data>
+  <data name="&gt;&gt;nupLines.Name" xml:space="preserve">
+    <value>nupLines</value>
+  </data>
   <data name="&gt;&gt;TextBox1.Parent" xml:space="preserve">
     <value>$this</value>
+  </data>
+  <data name="Button6.Text" xml:space="preserve">
+    <value>Fluxograma de Processos</value>
   </data>
   <data name="Button1.TabIndex" type="System.Int32, mscorlib">
     <value>13</value>
@@ -538,13 +601,16 @@
     <value>151, 44</value>
   </data>
   <data name="&gt;&gt;lblOrder.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>8</value>
   </data>
   <data name="ColumnHeader1.Width" type="System.Int32, mscorlib">
     <value>154</value>
   </data>
   <data name="Label4.Size" type="System.Drawing.Size, System.Drawing">
     <value>35, 13</value>
+  </data>
+  <data name="&gt;&gt;Label5.Parent" xml:space="preserve">
+    <value>$this</value>
   </data>
   <data name="&gt;&gt;Label4.Parent" xml:space="preserve">
     <value>$this</value>
@@ -565,13 +631,19 @@
     <value>Nome</value>
   </data>
   <data name="&gt;&gt;lvProps.ZOrder" xml:space="preserve">
-    <value>13</value>
+    <value>16</value>
   </data>
   <data name="Button2.TabIndex" type="System.Int32, mscorlib">
     <value>14</value>
   </data>
+  <data name="nupLines.TextAlign" type="System.Windows.Forms.HorizontalAlignment, System.Windows.Forms">
+    <value>Right</value>
+  </data>
   <data name="Label3.Size" type="System.Drawing.Size, System.Drawing">
     <value>63, 13</value>
+  </data>
+  <data name="nupLines.Location" type="System.Drawing.Point, System.Drawing">
+    <value>91, 338</value>
   </data>
   <data name="Button1.Text" xml:space="preserve">
     <value>Selec. Todos Objetos</value>
@@ -588,6 +660,9 @@
   <data name="&gt;&gt;cbObjectType.Type" xml:space="preserve">
     <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;Label5.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
   <data name="Label1.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
   </data>
@@ -599,6 +674,12 @@
   </data>
   <data name="btnOrderDown.Size" type="System.Drawing.Size, System.Drawing">
     <value>24, 24</value>
+  </data>
+  <data name="Label5.TabIndex" type="System.Int32, mscorlib">
+    <value>18</value>
+  </data>
+  <data name="Label5.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>

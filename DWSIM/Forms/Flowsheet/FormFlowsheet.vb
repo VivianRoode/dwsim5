@@ -181,8 +181,6 @@ Public Class FormFlowsheet
 
         Me.Options.BackupFileName = str & ".dwbcs"
 
-        Me.CalculationQueue = New Generic.Queue(Of ICalculationArgs)
-
         Me.FormSurface.TSTBZoom.Text = Format(Me.FormSurface.FlowsheetSurface.Zoom, "#%")
 
         If GlobalSettings.Settings.CalculatorActivated Then
@@ -2648,7 +2646,7 @@ Public Class FormFlowsheet
 
     Public Function GetTranslatedString(text As String, locale As String) As String Implements Interfaces.IFlowsheet.GetTranslatedString, IFlowsheetGUI.GetTranslatedString
 
-        Return DWSIM.App.GetLocalString(text)
+        Return GetTranslatedString1(text)
 
     End Function
 
@@ -2706,6 +2704,10 @@ Public Class FormFlowsheet
                     Return Options.SelectedComponents.OrderBy(Function(c) c.Value.NBP.GetValueOrDefault).ToDictionary(Of String, ICompoundConstantProperties)(Function(k) k.Key, Function(k) k.Value)
                 Case CompoundOrdering.NBP_DESC
                     Return Options.SelectedComponents.OrderByDescending(Function(c) c.Value.NBP.GetValueOrDefault).ToDictionary(Of String, ICompoundConstantProperties)(Function(k) k.Key, Function(k) k.Value)
+                Case CompoundOrdering.TAG_ASC
+                    Return Options.SelectedComponents.OrderBy(Function(c) c.Value.Tag).ToDictionary(Of String, ICompoundConstantProperties)(Function(k) k.Key, Function(k) k.Value)
+                Case CompoundOrdering.TAG_DESC
+                    Return Options.SelectedComponents.OrderByDescending(Function(c) c.Value.Tag).ToDictionary(Of String, ICompoundConstantProperties)(Function(k) k.Key, Function(k) k.Value)
                 Case Else
                     Return Options.SelectedComponents
             End Select
@@ -2847,6 +2849,7 @@ Public Class FormFlowsheet
     Public Function GetNewInstance() As IFlowsheet Implements IFlowsheet.GetNewInstance
         Dim fs As New FormFlowsheet()
         fs.Options.VisibleProperties = Me.Options.VisibleProperties
+        fs.FormSpreadsheet.Initialize()
         Return fs
     End Function
 

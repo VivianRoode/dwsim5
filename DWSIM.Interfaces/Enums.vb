@@ -250,6 +250,8 @@ Namespace Enums
 
         ST_Number_of_Random_Tries = 21
 
+        CheckIncipientLiquidForStability = 22
+
     End Enum
 
     Public Enum FlashCalculationType
@@ -412,6 +414,8 @@ Namespace Enums
         MW_DESC = 6
         CAS_ASC = 7
         CAS_DESC = 8
+        TAG_ASC = 9
+        TAG_DESC = 10
 
     End Enum
 
@@ -505,6 +509,8 @@ Namespace Enums.GraphicObjects
 
         GO_Chart
         GO_InputControl
+
+        External
 
     End Enum
 
